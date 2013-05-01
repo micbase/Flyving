@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Creature : MonoBehaviour {
 	
@@ -9,7 +10,7 @@ public class Creature : MonoBehaviour {
 	void Start () {
 		
 		oPlayer = GameObject.Find ("Player");
-		screenGrid = new Grid(100, 1, 1);
+		screenGrid = new Grid(20, 1, 1);
 	}
 	
 	void Update () {
@@ -79,18 +80,24 @@ public class Grid {
 	int gridSize;
 	float gridMargin;
 	float gridHeight;
-	GridCell[] gridArray;
+	float currentHeight;
+	List<GridCell> gridArray;
 	
 	public Grid (int size, float margin, float height) {
 		gridSize = size;
 		gridMargin = margin;
 		gridHeight = height;
 		
-		float currentHeight = 0;
+		currentHeight = 0;
 		
-		gridArray = new GridCell[gridSize];
+		gridArray = new List<GridCell>();
+		GenerateGrid();
+	}
+	
+	void GenerateGrid() {
+		
 		for (int i = 0; i < gridSize; i++) {
-			gridArray[i] = new GridCell(currentHeight, currentHeight - gridHeight);
+			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight));
 			currentHeight -= gridMargin + gridHeight;
 		}
 	}
@@ -112,10 +119,13 @@ public class Grid {
 			if (startPoint >= 0)
 				iStart = 0;
 			
-			if (iEnd > gridSize)
-				iEnd = gridSize;
+			if (iEnd > gridArray.Count) {
+				GenerateGrid();
+				iEnd = gridArray.Count;
+			}
 		}
 		else {
+			//fake code!!
 			iStart = 0;
 			iEnd = gridSize;
 		}			
@@ -126,6 +136,7 @@ public class Grid {
 				if (Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.x - playerPos.x) < 1 &&
 					Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.y - playerPos.y) < 1)
 					Application.LoadLevel("GameOver");
+					//Debug.Log("die");
 				
 				gridArray[i].getObj().Update();
 			}
