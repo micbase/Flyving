@@ -65,6 +65,10 @@ public class CreatureObject {
 		}
 	}
 	
+	public GameObject getObj() {
+		return obj;
+	}
+	
 	int generateType(float top, float bottom) {
 		return 0;	
 	}
@@ -114,11 +118,17 @@ public class Grid {
 		else {
 			iStart = 0;
 			iEnd = gridSize;
-		}
+		}			
 				
 		for (int i = iStart; i < iEnd; i++ ) {
-			if (gridArray[i].getObj() != null)
+			if (gridArray[i].getObj() != null) {
+				
+				if (Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.x - playerPos.x) < 1 &&
+					Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.y - playerPos.y) < 1)
+					Application.LoadLevel("GameOver");
+				
 				gridArray[i].getObj().Update();
+			}
 		}
 	}
 	
@@ -146,8 +156,7 @@ public class Grid {
 		}
 		
 		bool isGenerate(float top, float bottom) {
-			return true;
-			return (Random.Range (0.0F, 1.0F) < 0.5);
+			return (Random.Range (0.0F, 1.0F) < 0.8);
 		}
 
 	}

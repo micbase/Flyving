@@ -32,8 +32,8 @@ public class Player : MonoBehaviour {
 			oCamera.transform.Translate(0, -0.3F,0);
 		}
 		
-		//oCamera.transform.Translate(0, -0.2F, 0);
-		//oPlayer.transform.Translate(0, -0.2F, 0);
+		oCamera.transform.Translate(0, -0.2F, 0);
+		oPlayer.transform.Translate(0, -0.2F, 0);
 	}
 
 }
