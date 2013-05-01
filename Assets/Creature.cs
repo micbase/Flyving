@@ -13,7 +13,7 @@ public class Creature : MonoBehaviour {
 	}
 	
 	void Update () {
-		screenGrid.updateGrid(oPlayer.transform.localPosition.y + 10, oPlayer.transform.localPosition.y - 20);
+		screenGrid.updateGrid(oPlayer.transform.localPosition, 1);
 	}
 }
 
@@ -36,10 +36,10 @@ public class CreatureObject {
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);	
 		obj.transform.localScale = new Vector3(1, 1, 1);
 		
-		ridgeBody = obj.AddComponent("Rigidbody") as Rigidbody;
-		ridgeBody.useGravity = false;
-		ridgeBody.constraints = RigidbodyConstraints.FreezePositionY |
-		RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
+		//ridgeBody = obj.AddComponent("Rigidbody") as Rigidbody;
+		//ridgeBody.useGravity = false;
+		//ridgeBody.constraints = RigidbodyConstraints.FreezePositionY |
+		//RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
 		
 		iDirection = Random.Range(0, 2);
 		iSpeed = Random.Range(0.01F, 0.20F);
@@ -91,16 +91,30 @@ public class Grid {
 		}
 	}
 	
-	public void updateGrid(float startPoint, float endPoint) {
+	public void updateGrid(Vector3 playerPos, int direction) {
 		
-		int iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
-		int iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+		float startPoint;
+		float endPoint;
+		int iStart;
+		int iEnd;
 		
-		if (iStart < 0)
+		if (direction == 1) {
+				
+			startPoint = playerPos.y + 15;
+			endPoint = playerPos.y - 25;
+			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+			
+			if (startPoint >= 0)
+				iStart = 0;
+			
+			if (iEnd > gridSize)
+				iEnd = gridSize;
+		}
+		else {
 			iStart = 0;
-		
-		if (iEnd > gridSize)
 			iEnd = gridSize;
+		}
 				
 		for (int i = iStart; i < iEnd; i++ ) {
 			if (gridArray[i].getObj() != null)
@@ -132,6 +146,7 @@ public class Grid {
 		}
 		
 		bool isGenerate(float top, float bottom) {
+			return true;
 			return (Random.Range (0.0F, 1.0F) < 0.5);
 		}
 
