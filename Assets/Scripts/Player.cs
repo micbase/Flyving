@@ -39,8 +39,9 @@ public class Player : MonoBehaviour {
 		oPlayer.transform.Translate(0, -0.2F, 0);
 		oWater.transform.Translate(0,0,-0.2F); //	
 			
+		
 		if (Input.GetKeyDown(KeyCode.Space)) {
-//			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
 		}
 	}
 
