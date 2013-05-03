@@ -5,12 +5,15 @@ public class Player : MonoBehaviour {
 	
 	GameObject oPlayer;
 	GameObject oCamera;
+	GameObject oWater;
+	
 	public GameObject projectilePrefab;
 
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
+		oWater = GameObject.Find ("Water");
 	}
 	
 	void Update () {
@@ -34,9 +37,10 @@ public class Player : MonoBehaviour {
 		
 		oCamera.transform.Translate(0, -0.2F, 0);
 		oPlayer.transform.Translate(0, -0.2F, 0);
+		oWater.transform.Translate(0,0,-0.2F); //	
 			
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+//			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
 		}
 	}
 
