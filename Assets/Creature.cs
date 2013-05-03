@@ -16,19 +16,14 @@ public class Creature : MonoBehaviour {
 	void Update () {
 		screenGrid.updateGrid(oPlayer.transform.localPosition, 1);
 	}
-	
-	void OnCollisionEnter(Collision collision) {
-		Debug.Log("Collided with " + collision.gameObject.name);
-	}
+
 }
 
 public class CreatureObject {
 		
 	GameObject obj;
-	Rigidbody ridgeBody;
-	BoxCollider boxCollider;
-	int iType = 0;
-	int iStatus = 0;
+	int iType = 1;
+	int iStatus = 1;
 	float iSpeed = 1;
 	int iDirection = 0;
 	float leftInitial = -17;
@@ -39,24 +34,18 @@ public class CreatureObject {
 	public CreatureObject(float top, float bottom) {
 		
 		iType = generateType(top, bottom);
+		iStatus = 1;
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		
 		if (iType == 1) {
 			Material mDolphin = Resources.LoadAssetAtPath("Assets/mDolphin.mat", typeof(Material)) as Material;
 			obj.renderer.material = mDolphin;
 			obj.transform.localScale = new Vector3(3, 1.5F, 1);
+			obj.transform.Rotate(0, 180, 0);
 		}
 		else {
 			
 		}
-		
-		//boxCollider = obj.AddComponent("BoxCollider") as BoxCollider;
-		boxCollider = obj.GetComponent("BoxCollider") as BoxCollider;
-		boxCollider.isTrigger = true;
-		//ridgeBody = obj.AddComponent("Rigidbody") as Rigidbody;
-		//ridgeBody.useGravity = false;
-		//ridgeBody.constraints = RigidbodyConstraints.FreezePositionY |
-		//RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotation;
 		
 		iDirection = Random.Range(0, 2);
 		iSpeed = Random.Range(0.01F, 0.20F);
@@ -148,12 +137,6 @@ public class Grid {
 				
 		for (int i = iStart; i < iEnd; i++ ) {
 			if (gridArray[i].getObj() != null) {
-				
-				if (Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.x - playerPos.x) < 1 &&
-					Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.y - playerPos.y) < 1)
-					//Application.LoadLevel("GameOver");
-					Debug.Log("die");
-				
 				gridArray[i].getObj().Update();
 			}
 		}
@@ -183,7 +166,7 @@ public class Grid {
 		}
 		
 		bool isGenerate(float top, float bottom) {
-			return (Random.Range (0.0F, 1.0F) < 0.8);
+			return (Random.Range (0.0F, 1.0F) < 0.3);
 		}
 
 	}

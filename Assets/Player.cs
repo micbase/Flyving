@@ -5,10 +5,11 @@ public class Player : MonoBehaviour {
 	
 	GameObject oPlayer;
 	GameObject oCamera;
+	public GameObject projectilePrefab;
 
 	void Start () {
 		
-		oPlayer = GameObject.Find ("Player");
+		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
 	}
 	
@@ -33,9 +34,15 @@ public class Player : MonoBehaviour {
 		
 		oCamera.transform.Translate(0, -0.2F, 0);
 		oPlayer.transform.Translate(0, -0.2F, 0);
+			
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+		}
 	}
+
+	void OnTriggerEnter() {
+		//Application.LoadLevel("GameOver");
+		Debug.Log("die");		
+	}	
 	
-	void OnCollisionEnter(Collision collision) {
-		Debug.Log("Collided with " + collision.gameObject.name);
-	}
 }
