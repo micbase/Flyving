@@ -6,7 +6,7 @@ public class Creature : MonoBehaviour {
 	
 	Grid screenGrid;
 	GameObject oPlayer;
-
+	
 	void Start () {
 		
 		oPlayer = GameObject.Find ("Player");
@@ -16,12 +16,17 @@ public class Creature : MonoBehaviour {
 	void Update () {
 		screenGrid.updateGrid(oPlayer.transform.localPosition, 1);
 	}
+	
+	void OnCollisionEnter(Collision collision) {
+		Debug.Log("Collided with " + collision.gameObject.name);
+	}
 }
 
 public class CreatureObject {
 		
 	GameObject obj;
 	Rigidbody ridgeBody;
+	BoxCollider boxCollider;
 	int iType = 0;
 	int iStatus = 0;
 	float iSpeed = 1;
@@ -34,9 +39,20 @@ public class CreatureObject {
 	public CreatureObject(float top, float bottom) {
 		
 		iType = generateType(top, bottom);
-		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);	
-		obj.transform.localScale = new Vector3(1, 1, 1);
+		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		
+		if (iType == 1) {
+			Material mDolphin = Resources.LoadAssetAtPath("Assets/mDolphin.mat", typeof(Material)) as Material;
+			obj.renderer.material = mDolphin;
+			obj.transform.localScale = new Vector3(3, 1.5F, 1);
+		}
+		else {
+			
+		}
+		
+		//boxCollider = obj.AddComponent("BoxCollider") as BoxCollider;
+		boxCollider = obj.GetComponent("BoxCollider") as BoxCollider;
+		boxCollider.isTrigger = true;
 		//ridgeBody = obj.AddComponent("Rigidbody") as Rigidbody;
 		//ridgeBody.useGravity = false;
 		//ridgeBody.constraints = RigidbodyConstraints.FreezePositionY |
@@ -46,9 +62,9 @@ public class CreatureObject {
 		iSpeed = Random.Range(0.01F, 0.20F);
 		
 		if (iDirection == 0)
-			obj.transform.position = new Vector3(leftInitial, Random.Range (top, bottom), 0);
+			obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);
 		else
-			obj.transform.position = new Vector3(rightInitial, Random.Range (top, bottom), 0);	
+			obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);	
 	}
 	
 	public void Update() {
@@ -71,7 +87,7 @@ public class CreatureObject {
 	}
 	
 	int generateType(float top, float bottom) {
-		return 0;	
+		return 1;
 	}
 }
 
@@ -135,8 +151,8 @@ public class Grid {
 				
 				if (Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.x - playerPos.x) < 1 &&
 					Mathf.Abs(gridArray[i].getObj().getObj().transform.localPosition.y - playerPos.y) < 1)
-					Application.LoadLevel("GameOver");
-					//Debug.Log("die");
+					//Application.LoadLevel("GameOver");
+					Debug.Log("die");
 				
 				gridArray[i].getObj().Update();
 			}
