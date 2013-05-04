@@ -38,7 +38,7 @@ public class CreatureObject {
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		
 		if (iType == 1) {
-			Material mDolphin = Resources.LoadAssetAtPath("Assets/mDolphin.mat", typeof(Material)) as Material;
+			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
 			obj.renderer.material = mDolphin;
 			obj.transform.localScale = new Vector3(3, 1.5F, 1);
 			obj.transform.Rotate(0, 180, 0);
