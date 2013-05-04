@@ -14,6 +14,11 @@ public class Creature : MonoBehaviour {
 	}
 	
 	void Update () {
+		
+		//direction 1: diving down
+		//direction 2: diving up
+		//direction 3: flying up
+		//direction 4: flying down
 		screenGrid.updateGrid(oPlayer.transform.localPosition, 1);
 	}
 
@@ -36,6 +41,7 @@ public class CreatureObject {
 		iType = generateType(top, bottom);
 		iStatus = 1;
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		//obj.AddComponent<CreatureObject>
 		
 		if (iType == 1) {
 			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
@@ -56,6 +62,11 @@ public class CreatureObject {
 			obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);	
 	}
 	
+	public void setStatus(int status) {
+		
+		iStatus = status;
+	}
+	
 	public void Update() {
 		
 		if (iDirection == 0)
@@ -69,10 +80,6 @@ public class CreatureObject {
 		else if (obj.transform.localPosition.x < screenLeft) {
 			iDirection = 0;
 		}
-	}
-	
-	public GameObject getObj() {
-		return obj;
 	}
 	
 	int generateType(float top, float bottom) {
@@ -89,11 +96,12 @@ public class Grid {
 	List<GridCell> gridArray;
 	
 	public Grid (int size, float margin, float height) {
+		
 		gridSize = size;
 		gridMargin = margin;
 		gridHeight = height;
 		
-		currentHeight = 0;
+		currentHeight = -10;
 		
 		gridArray = new List<GridCell>();
 		GenerateGrid();
@@ -136,9 +144,7 @@ public class Grid {
 		}			
 				
 		for (int i = iStart; i < iEnd; i++ ) {
-			if (gridArray[i].getObj() != null) {
-				gridArray[i].getObj().Update();
-			}
+			gridArray[i].Update();
 		}
 	}
 	
@@ -147,7 +153,7 @@ public class Grid {
 		float topPosition;
 		float bottomPosition;
 		bool hasCreature = false;
-		CreatureObject objCell = null;
+		CreatureObject oCreature = null;
 		
 		public GridCell(float top, float bottom) {
 			topPosition = top;
@@ -155,14 +161,13 @@ public class Grid {
 			
 			hasCreature = isGenerate(topPosition, bottomPosition);
 			if (hasCreature)
-				objCell = new CreatureObject(topPosition, bottomPosition);
+				oCreature = new CreatureObject(topPosition, bottomPosition);
 		}
 		
-		public CreatureObject getObj() {
+		public void Update() {
+			
 			if (hasCreature)
-				return objCell;
-			else
-				return null;
+				oCreature.Update();
 		}
 		
 		bool isGenerate(float top, float bottom) {

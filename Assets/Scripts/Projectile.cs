@@ -26,6 +26,9 @@ public class Projectile : MonoBehaviour {
 				
 		if (collider.gameObject.name == "Cube") {
 			Debug.Log(collider.gameObject.name);
+			
+			//CreatureObject a = collider.gameObject.GetComponent(typeof(CreatureObject)) as CreatureObject;
+			//Debug.Log(a.iStatus);
 			Destroy(this.gameObject);
 			//Destroy(other.gameObject);
 		}
