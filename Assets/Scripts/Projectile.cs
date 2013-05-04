@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider other) {
 		
-		Debug.Log (other.gameObject.transform.parent.ToString());
+		Debug.Log (other.gameObject.name);
 		
 		if (other.gameObject != oPlayer) {
 			//Destroy(other.gameObject);	

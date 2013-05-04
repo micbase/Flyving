@@ -52,9 +52,11 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter() {
-		//Application.LoadLevel("GameOver");
-		Debug.Log("die");		
+	void OnTriggerEnter(Collider colider) {
+		if (colider.gameObject.name == "Cube") {
+			Application.LoadLevel("GameOver");
+			Debug.Log("die");
+		}
 	}	
 	
 }
