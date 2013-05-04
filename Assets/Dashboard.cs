@@ -16,7 +16,6 @@ public class Dashboard : MonoBehaviour {
 		timeCount = 30;
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		
 		timeCount -= Time.deltaTime;
