@@ -6,12 +6,10 @@ public class Projectile : MonoBehaviour {
 	public float projectileSpeed;
 	private Transform myTransform;
 	GameObject oCamera;
-	GameObject oPlayer;
 	
 	// Use this for initialization
 	void Start () {
 		oCamera = GameObject.Find ("Main Camera");
-		oPlayer = GameObject.Find ("Player");
 		myTransform = gameObject.transform;
 	}
 	
@@ -24,12 +22,12 @@ public class Projectile : MonoBehaviour {
 		}
 	}
 	
-	void OnTriggerEnter(Collider other) {
-		
-		Debug.Log (other.gameObject.name);
-		
-		if (other.gameObject != oPlayer) {
-			//Destroy(other.gameObject);	
+	void OnTriggerEnter(Collider collider) {
+				
+		if (collider.gameObject.name == "Cube") {
+			Debug.Log(collider.gameObject.name);
+			Destroy(this.gameObject);
+			//Destroy(other.gameObject);
 		}
 	}
 }
