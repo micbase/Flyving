@@ -4,35 +4,142 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour {
 	
-	GridObject screenGrid;
+	int gridSize;
+	float gridMargin;
+	float gridHeight;
+	float currentHeight;
+	float initialHeight = -10;
+	
+	List<GridCell> gridArray;
 	GameObject oPlayer;
+	int currentDirection;
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
-		screenGrid = new GridObject(20, 1, 1);
+		
+		gridSize = 20;
+		gridMargin = 1;
+		gridHeight = 1;
+		
+		currentHeight = initialHeight;
+		currentDirection = 1;
+		
+		gridArray = new List<GridCell>();
+		GenerateGrid();
 	}
 	
 	void Update () {
 		
+		float startPoint;
+		float endPoint;
+		int iStart;
+		int iEnd;
+				
 		//direction 1: diving down
 		//direction 2: diving up
 		//direction 3: flying up
 		//direction 4: flying down
-		screenGrid.updateGrid(oPlayer.transform.localPosition, 1);
+
+		if (currentDirection == 1) {
+				
+			startPoint = oPlayer.transform.localPosition.y + 15;
+			endPoint = oPlayer.transform.localPosition.y - 25;
+			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+			
+			if (startPoint >= 0)
+				iStart = 0;
+			
+			if (iEnd > gridArray.Count) {
+				GenerateGrid();
+				iEnd = gridArray.Count;
+			}
+		}
+		else {
+			//fake code!!
+			iStart = 0;
+			iEnd = gridSize;
+		}			
+				
+		for (int i = iStart; i < iEnd; i++ ) {
+			gridArray[i].Update();
+		}
+	}
+
+	
+	void GenerateGrid() {
+		
+		for (int i = 0; i < gridSize; i++) {
+			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight));
+			currentHeight -= gridMargin + gridHeight;
+		}
+	}
+	
+	public void setDirection(int direction) {
+		
+		currentDirection = direction;
 	}
 	
 	public void updateStatus(int objID, float top, int newStatus) {
 		
-		screenGrid.updateStatus(objID, top, newStatus);
+		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
+		gridArray[index].updateStatus(objID, newStatus);
 	}
-	
+		
 	public void whenCollide(int objID, float top, int type) {
-	
-		screenGrid.whenCollide(objID, top, type);
+		
+		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
+		gridArray[index].whenCollide(objID, type);
 	}
+	
+	public class GridCell {
+		
+		float topPosition;
+		float bottomPosition;
+		bool hasCreature = false;
+		CreatureObject oCreature = null;
+		
+		public GridCell(float top, float bottom) {
+			topPosition = top;
+			bottomPosition = bottom;
+			
+			hasCreature = isGenerate(topPosition, bottomPosition);
+			if (hasCreature)
+				oCreature = new CreatureObject(topPosition, bottomPosition);
+		}
+		
+		public void Update() {
+			
+			if (hasCreature)
+				oCreature.Update();
+		}
+		
+		public void updateStatus(int objID, int newStatus) {
+		
+			if (hasCreature && oCreature.getObjID() == objID)
+				oCreature.setStatus(newStatus);
+		}
+		
+		public void whenCollide(int objID, int type) {
+		
+			if (type == 1) {
+				
+				if (oCreature.getStatus() == 1) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("die");
+				}
+			}
+		}
+		
+		bool isGenerate(float top, float bottom) {
+			
+			return (Random.Range (0.0F, 1.0F) < 0.7);
+		}
 
+	}
 }
+
 
 public class CreatureObject {
 			
@@ -106,126 +213,5 @@ public class CreatureObject {
 	
 	int generateType(float top, float bottom) {
 		return 1;
-	}
-}
-
-public class GridObject {
-	
-	int gridSize;
-	float gridMargin;
-	float gridHeight;
-	float currentHeight;
-	float initialHeight = -10;
-	List<GridCell> gridArray;
-	
-	public GridObject (int size, float margin, float height) {
-		
-		gridSize = size;
-		gridMargin = margin;
-		gridHeight = height;
-		
-		currentHeight = initialHeight;
-		
-		gridArray = new List<GridCell>();
-		GenerateGrid();
-	}
-	
-	void GenerateGrid() {
-		
-		for (int i = 0; i < gridSize; i++) {
-			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight));
-			currentHeight -= gridMargin + gridHeight;
-		}
-	}
-	
-	public void updateGrid(Vector3 playerPos, int direction) {
-		
-		float startPoint;
-		float endPoint;
-		int iStart;
-		int iEnd;
-		
-		if (direction == 1) {
-				
-			startPoint = playerPos.y + 15;
-			endPoint = playerPos.y - 25;
-			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
-			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
-			
-			if (startPoint >= 0)
-				iStart = 0;
-			
-			if (iEnd > gridArray.Count) {
-				GenerateGrid();
-				iEnd = gridArray.Count;
-			}
-		}
-		else {
-			//fake code!!
-			iStart = 0;
-			iEnd = gridSize;
-		}			
-				
-		for (int i = iStart; i < iEnd; i++ ) {
-			gridArray[i].Update();
-		}
-	}
-	
-	public void updateStatus(int objID, float top, int newStatus) {
-		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].updateStatus(objID, newStatus);
-	}
-		
-	public void whenCollide(int objID, float top, int type) {
-		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].whenCollide(objID, type);
-	}
-	
-	public class GridCell {
-		
-		float topPosition;
-		float bottomPosition;
-		bool hasCreature = false;
-		CreatureObject oCreature = null;
-		
-		public GridCell(float top, float bottom) {
-			topPosition = top;
-			bottomPosition = bottom;
-			
-			hasCreature = isGenerate(topPosition, bottomPosition);
-			if (hasCreature)
-				oCreature = new CreatureObject(topPosition, bottomPosition);
-		}
-		
-		public void Update() {
-			
-			if (hasCreature)
-				oCreature.Update();
-		}
-		
-		public void updateStatus(int objID, int newStatus) {
-		
-			if (hasCreature && oCreature.getObjID() == objID)
-				oCreature.setStatus(newStatus);
-		}
-		
-		public void whenCollide(int objID, int type) {
-		
-			if (type == 1) {
-				
-				if (oCreature.getStatus() == 1) {
-					Application.LoadLevel("GameOver");
-					Debug.Log("die");
-				}
-			}
-		}
-		
-		bool isGenerate(float top, float bottom) {
-			
-			return (Random.Range (0.0F, 1.0F) < 0.7);
-		}
-
 	}
 }
