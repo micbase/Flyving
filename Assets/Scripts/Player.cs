@@ -52,9 +52,8 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter(Collider colider) {
-		Debug.Log(collider.gameObject.name);
-
+	void OnTriggerEnter(Collider collider) {
+		
 		if (collider.gameObject.tag == "Creature") {
 			
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
