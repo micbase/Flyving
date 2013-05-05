@@ -41,10 +41,10 @@ public class Player : MonoBehaviour {
 			oBubble.transform.Translate(0, -0.3F, 0);
 		}
 		
-		oCamera.transform.Translate(0, -0.2F, 0);
-		oPlayer.transform.Translate(0, -0.2F, 0);
-		oBubble.transform.Translate(0, -0.2F, 0);
-		oWater.transform.Translate(0,0,-0.2F); //	
+		oCamera.transform.Translate(0, -0.1F, 0);
+		oPlayer.transform.Translate(0, -0.1F, 0);
+		oBubble.transform.Translate(0, -0.1F, 0);
+		oWater.transform.Translate(0,0,-0.1F); //	
 			
 		
 		if (Input.GetKeyDown(KeyCode.Space)) {
@@ -53,9 +53,12 @@ public class Player : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider colider) {
-		if (colider.gameObject.name == "Cube") {
-			Application.LoadLevel("GameOver");
-			Debug.Log("die");
+		Debug.Log(collider.gameObject.name);
+
+		if (collider.gameObject.tag == "Creature") {
+			
+			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 1);
 		}
 	}	
 	

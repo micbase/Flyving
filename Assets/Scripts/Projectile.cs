@@ -13,7 +13,7 @@ public class Projectile : MonoBehaviour {
 		myTransform = gameObject.transform;
 	}
 	
-	// Update is called once per frame
+	// Update is called oncex per frame
 	void Update () {
 		float amtToMove = projectileSpeed*Time.deltaTime;
 		myTransform.Translate(0.0f,-amtToMove,0.0f);
@@ -24,13 +24,11 @@ public class Projectile : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider collider) {
 				
-		if (collider.gameObject.name == "Cube") {
-			Debug.Log(collider.gameObject.name);
+		if (collider.gameObject.tag == "Creature") {
 			
-			//CreatureObject a = collider.gameObject.GetComponent(typeof(CreatureObject)) as CreatureObject;
-			//Debug.Log(a.iStatus);
+			Grid screenGrid =  GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
+			screenGrid.updateStatus(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
 			Destroy(this.gameObject);
-			//Destroy(other.gameObject);
 		}
 	}
 }
