@@ -117,19 +117,13 @@ public class Grid : MonoBehaviour {
 		
 		public void updateStatus(int objID, int newStatus) {
 		
-			if (hasCreature && oCreature.getObjID() == objID)
+			if (hasCreature && oCreature.ObjID == objID)
 				oCreature.setStatus(newStatus);
 		}
 		
 		public void whenCollide(int objID, int type) {
 		
-			if (type == 1) {
-				
-				if (oCreature.getStatus() == 1) {
-					Application.LoadLevel("GameOver");
-					Debug.Log("die");
-				}
-			}
+			oCreature.whenCollide();
 		}
 		
 		bool isGenerate(float top, float bottom) {
@@ -141,57 +135,47 @@ public class Grid : MonoBehaviour {
 }
 
 
-public class CreatureObject {
+
+public abstract class BaseObject {
 			
-	int objID;
-	GameObject obj;
-	int iType = 1;
-	int iStatus = 1;
-	float fSpeed = 1;
-	int iDirection = 0;
+	protected int objID;
+	protected GameObject obj;
+	protected int iType;
+	protected int iStatus;
+	protected float fSpeed;
+	protected int iDirection;
+	
 	float leftInitial = -13;
 	float rightInitial = 13;
 	float screenLeft = -14;
 	float screenRight = 14;
 	
-	public CreatureObject(float top, float bottom) {
+	public BaseObject(float top, float bottom) {
 		
 		iType = generateType(top, bottom);
-		iStatus = 1;
+		iDirection = Random.Range(0, 2);
+		
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		objID = this.GetHashCode();
-		obj.tag = "Creature";
 		obj.name = objID.ToString();
-		
-		if (iType == 1) {
-			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
-			obj.renderer.material = mDolphin;
-			obj.transform.localScale = new Vector3(3, 1.5F, 1);
-			obj.transform.Rotate(0, 180, 0);
-		}
-		else {
-			
-		}
-
-		iDirection = Random.Range(0, 2);
-		fSpeed = Random.Range(0.01F, 0.20F);
 		obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);	
 	}
 	
 	public void setStatus(int status) {
 		
 		iStatus = status;
-		obj.renderer.enabled = false;
+		
+		if (iStatus == 2)
+			obj.renderer.enabled = false;
+		else
+			obj.renderer.enabled = true;
 	}
 	
-	public int getStatus() {
+	public int ObjID {
 		
-		return iStatus;
-	}
-	
-	public int getObjID() {
-		
-		return objID;
+		get {
+			return objID;
+		}
 	}
 	
 	public void Update() {
@@ -211,7 +195,39 @@ public class CreatureObject {
 		}
 	}
 	
-	int generateType(float top, float bottom) {
+	protected abstract int generateType(float top, float bottom);// { return 0; }
+	
+	public void whenCollide() {}
+}
+
+public class CreatureObject : BaseObject {
+	
+	public CreatureObject(float top, float bottom) : base(top, bottom) {
+	
+		obj.tag = "Creature";
+		iStatus = 1;
+		
+		if (iType == 1) {
+			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
+			obj.renderer.material = mDolphin;
+			obj.transform.localScale = new Vector3(3, 1.5F, 1);
+			obj.transform.Rotate(0, 180, 0);
+			fSpeed = Random.Range(0.01F, 0.20F);
+		}
+		else {
+			
+		}
+
+	}
+	
+	public void whenCollide() {
+		if (iStatus == 1) {
+			Application.LoadLevel("GameOver");
+			Debug.Log("die");
+		}
+	}
+		
+	protected override int generateType(float top, float bottom) {
 		return 1;
 	}
 }
