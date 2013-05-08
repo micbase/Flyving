@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 public class Grid : MonoBehaviour {
 	
@@ -98,7 +99,7 @@ public class Grid : MonoBehaviour {
 		float topPosition;
 		float bottomPosition;
 		bool hasCreature = false;
-		CreatureObject oCreature = null;
+		Creature oCreature = null;
 		
 		public GridCell(float top, float bottom) {
 			topPosition = top;
@@ -106,7 +107,7 @@ public class Grid : MonoBehaviour {
 			
 			hasCreature = isGenerate(topPosition, bottomPosition);
 			if (hasCreature)
-				oCreature = new CreatureObject(topPosition, bottomPosition);
+				oCreature = new Creature(topPosition, bottomPosition);
 		}
 		
 		public void Update() {
@@ -136,7 +137,7 @@ public class Grid : MonoBehaviour {
 
 
 
-public abstract class BaseObject {
+public abstract class Base {
 			
 	protected int objID;
 	protected GameObject obj;
@@ -144,14 +145,15 @@ public abstract class BaseObject {
 	protected int iStatus;
 	protected float fSpeed;
 	protected int iDirection;
+	protected List<string> objectTypes;
 	
 	float leftInitial = -13;
 	float rightInitial = 13;
 	float screenLeft = -14;
 	float screenRight = 14;
 	
-	public BaseObject(float top, float bottom) {
-		
+	public Base(float top, float bottom) {
+		objectTypes = new List<string>();
 		iType = generateType(top, bottom);
 		iDirection = Random.Range(0, 2);
 		
@@ -197,26 +199,27 @@ public abstract class BaseObject {
 	
 	protected abstract int generateType(float top, float bottom);// { return 0; }
 	
+	protected abstract List<string> readTypes(); //returns the type of objects (e.g. fish, boxes)
+	
 	public void whenCollide() {}
+	
+	
 }
 
-public class CreatureObject : BaseObject {
+public class Creature : Base {
 	
-	public CreatureObject(float top, float bottom) : base(top, bottom) {
-	
+	public Creature(float top, float bottom) : base(top, bottom) {
+		
 		obj.tag = "Creature";
 		iStatus = 1;
 		
-		if (iType == 1) {
-			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
-			obj.renderer.material = mDolphin;
-			obj.transform.localScale = new Vector3(3, 1.5F, 1);
-			obj.transform.Rotate(0, 180, 0);
-			fSpeed = Random.Range(0.01F, 0.20F);
-		}
-		else {
-			
-		}
+		string type = readTypes()[iType];
+		
+		Material mat = Resources.Load("Materials/m" + type, typeof(Material)) as Material;
+		obj.renderer.material = mat;
+		obj.transform.localScale = new Vector3(3, 1.5F, 1);
+		obj.transform.Rotate(0, 180, 0);
+		fSpeed = Random.Range(0.01F, 0.20F);
 
 	}
 	
@@ -228,6 +231,14 @@ public class CreatureObject : BaseObject {
 	}
 		
 	protected override int generateType(float top, float bottom) {
-		return 1;
+		return 0;
+	}
+	
+	protected override List<string> readTypes(){
+		TextReader tr = new StreamReader("Assets/Resources/allfish.txt");
+		foreach(string fishType in tr.ReadLine().Split(',')){
+			objectTypes.Add(fishType);
+		}
+		return objectTypes;
 	}
 }
