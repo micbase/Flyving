@@ -2,6 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+public enum ObjStatus { Normal = 1, Stop, Invisiable };
+public enum CreatureType { Dolphin = 1 };
+public enum TreasureType { Gun = 1 };
+public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown };
+public enum WeaponType { Gun = 1, Bomb };
+
 public class Grid : MonoBehaviour {
 	
 	int gridSize;
@@ -12,7 +18,7 @@ public class Grid : MonoBehaviour {
 	
 	List<GridCell> gridArray;
 	GameObject oPlayer;
-	int currentDirection;
+	GameDirection currentDirection;
 	
 	void Start () {
 		
@@ -23,7 +29,7 @@ public class Grid : MonoBehaviour {
 		gridHeight = 1;
 		
 		currentHeight = initialHeight;
-		currentDirection = 1;
+		currentDirection = GameDirection.DivingDown;
 		
 		gridArray = new List<GridCell>();
 		GenerateGrid();
@@ -35,13 +41,8 @@ public class Grid : MonoBehaviour {
 		float endPoint;
 		int iStart;
 		int iEnd;
-				
-		//direction 1: diving down
-		//direction 2: diving up
-		//direction 3: flying up
-		//direction 4: flying down
 
-		if (currentDirection == 1) {
+		if (currentDirection == GameDirection.DivingDown) {
 				
 			startPoint = oPlayer.transform.localPosition.y + 15;
 			endPoint = oPlayer.transform.localPosition.y - 25;
@@ -76,15 +77,15 @@ public class Grid : MonoBehaviour {
 		}
 	}
 	
-	public void setDirection(int direction) {
+	public void setDirection(GameDirection direction) {
 		
 		currentDirection = direction;
 	}
 	
-	public void updateStatus(int objID, float top, int newStatus) {
+	public void applyWeapon(int objID, float top, WeaponType weaponType) {
 		
 		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].updateStatus(objID, newStatus);
+		gridArray[index].applyWeapon(objID, weaponType);
 	}
 		
 	public void whenCollide(int objID, float top, int type) {
@@ -115,10 +116,13 @@ public class Grid : MonoBehaviour {
 				oCreature.Update();
 		}
 		
-		public void updateStatus(int objID, int newStatus) {
+		public void applyWeapon(int objID, WeaponType weaponType) {
 		
-			if (hasCreature && oCreature.ObjID == objID)
-				oCreature.setStatus(newStatus);
+			if (hasCreature && oCreature.ObjID == objID) {
+				
+				if (weaponType == WeaponType.Gun)
+					oCreature.setStatus(ObjStatus.Invisiable);
+			}
 		}
 		
 		public void whenCollide(int objID, int type) {
@@ -135,13 +139,11 @@ public class Grid : MonoBehaviour {
 }
 
 
-
 public abstract class BaseObject {
 			
 	protected int objID;
 	protected GameObject obj;
-	protected int iType;
-	protected int iStatus;
+	protected ObjStatus iStatus;
 	protected float fSpeed;
 	protected int iDirection;
 	
@@ -152,7 +154,6 @@ public abstract class BaseObject {
 	
 	public BaseObject(float top, float bottom) {
 		
-		iType = generateType(top, bottom);
 		iDirection = Random.Range(0, 2);
 		
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -161,11 +162,11 @@ public abstract class BaseObject {
 		obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);	
 	}
 	
-	public void setStatus(int status) {
+	public void setStatus(ObjStatus status) {
 		
 		iStatus = status;
 		
-		if (iStatus == 2)
+		if (iStatus == ObjStatus.Invisiable)
 			obj.renderer.enabled = false;
 		else
 			obj.renderer.enabled = true;
@@ -180,7 +181,7 @@ public abstract class BaseObject {
 	
 	public void Update() {
 		
-		if (iStatus == 1) {
+		if (iStatus == ObjStatus.Normal) {
 			if (iDirection == 1)
 				obj.transform.Translate(fSpeed, 0, 0);
 			else
@@ -195,19 +196,20 @@ public abstract class BaseObject {
 		}
 	}
 	
-	protected abstract int generateType(float top, float bottom);// { return 0; }
-	
-	public void whenCollide() {}
+	public abstract void whenCollide();
 }
 
 public class CreatureObject : BaseObject {
 	
+	CreatureType iType;
+	
 	public CreatureObject(float top, float bottom) : base(top, bottom) {
 	
 		obj.tag = "Creature";
-		iStatus = 1;
+		iStatus = ObjStatus.Normal;
+		iType = generateType(top, bottom);
 		
-		if (iType == 1) {
+		if (iType == CreatureType.Dolphin) {
 			Material mDolphin = Resources.LoadAssetAtPath("Assets/Materials/mDolphin.mat", typeof(Material)) as Material;
 			obj.renderer.material = mDolphin;
 			obj.transform.localScale = new Vector3(3, 1.5F, 1);
@@ -220,14 +222,14 @@ public class CreatureObject : BaseObject {
 
 	}
 	
-	public void whenCollide() {
-		if (iStatus == 1) {
+	public override void whenCollide() {
+		if (iStatus == ObjStatus.Normal) {
 			Application.LoadLevel("GameOver");
 			Debug.Log("die");
 		}
 	}
 		
-	protected override int generateType(float top, float bottom) {
-		return 1;
+	CreatureType generateType(float top, float bottom) {
+		return CreatureType.Dolphin;
 	}
 }
