@@ -21,10 +21,13 @@ public class Grid : MonoBehaviour {
 	List<GridCell> gridArray;
 	GameObject oPlayer;
 	GameDirection currentDirection;
+	Config[] objectDetails;
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
+		objectDetails = new Config[2];
+        objectDetails[0] = new Config("Assets/Resources/allfish.txt");
 		
 		gridSize = 20;
 		gridMargin = 1;
@@ -46,8 +49,8 @@ public class Grid : MonoBehaviour {
 
 		if (currentDirection == GameDirection.DivingDown) {
 				
-			startPoint = oPlayer.transform.localPosition.y + 15;
-			endPoint = oPlayer.transform.localPosition.y - 25;
+			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
+			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
 			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
 			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
 			
@@ -63,8 +66,8 @@ public class Grid : MonoBehaviour {
 			//fake code!!
 			iStart = 0;
 			iEnd = gridSize;
-		}			
-				
+		}	
+		
 		for (int i = iStart; i < iEnd; i++ ) {
 			gridArray[i].Update();
 		}
@@ -74,7 +77,7 @@ public class Grid : MonoBehaviour {
 	void GenerateGrid() {
 		
 		for (int i = 0; i < gridSize; i++) {
-			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight));
+			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
 			currentHeight -= gridMargin + gridHeight;
 		}
 	}
@@ -103,13 +106,13 @@ public class Grid : MonoBehaviour {
 		bool hasCreature = false;
 		Creature oCreature = null;
 		
-		public GridCell(float top, float bottom) {
+		public GridCell(float top, float bottom, Config[] objectDetail) {
 			topPosition = top;
 			bottomPosition = bottom;
 			
 			hasCreature = isGenerate(topPosition, bottomPosition);
 			if (hasCreature)
-				oCreature = new Creature(topPosition, bottomPosition);
+				oCreature = new Creature(topPosition, bottomPosition, objectDetail[0]);
 		}
 		
 		public void Update() {
@@ -149,7 +152,6 @@ public abstract class Base {
 	protected float fSpeed;
 	protected int iType;
 	protected int iDirection;
-	protected Config objectDetails;
 	
 	float leftInitial = -13;
 	float rightInitial = 13;
@@ -205,30 +207,32 @@ public abstract class Base {
 
 public class Creature : Base {
 	
-	public Creature(float top, float bottom) : base(top, bottom) {
-		objectDetails = new Config("Assets/Resources/allfish.txt");
+	int iHealth;
+	
+	public Creature(float top, float bottom, Config oCDetails) : base(top, bottom) {
+		
 		obj.tag = "Creature";
 		iStatus = ObjStatus.Normal;
-		iType = generateType(top, bottom, objectDetails);
+		iType = generateType(top, bottom, oCDetails);
+		iHealth = oCDetails.getHealth(iType);
 		
-		Debug.Log("Materials/m" + objectDetails.getTypes()[iType]);
-		Material mat = Resources.Load("Materials/m" + objectDetails.getTypes()[iType], typeof(Material)) as Material;
+		Material mat = Resources.Load("Materials/m" + oCDetails.getTypes(iType), typeof(Material)) as Material;
 		obj.renderer.material = mat;
 		obj.transform.localScale = new Vector3(3, 1.5F, 1);
 		obj.transform.Rotate(0, 180, 0);
 		
-		fSpeed = Random.Range(objectDetails.getSpeed()[0,iType], objectDetails.getSpeed()[1,iType]);
+		fSpeed = Random.Range(oCDetails.getSpeed(iType)[0], oCDetails.getSpeed(iType)[1]);
 	}
 	
 	public override void whenCollide() {
 		if (iStatus == ObjStatus.Normal) {
-			Application.LoadLevel("GameOver");
+			//Application.LoadLevel("GameOver");
 			Debug.Log("die");
 		}
 	}
 		
 	protected override int generateType(float top, float bottom, Config oDetails) {
-		int index = Random.Range(0,oDetails.getTypes().Length - 1);
+		int index = Random.Range(0,oDetails.getCount() - 1);
 		return index;
 	}
 	
@@ -242,6 +246,7 @@ public class Config{
 	float[,] speed;
 	int[] health;
 	int[] points;
+    int count;
 	
 	public  Config(string filepath){
 		int lineCount = 0;
@@ -258,6 +263,7 @@ public class Config{
 		speed = new float[2,lineCount];
 		health = new int[lineCount];
 		points = new int[lineCount];
+        count = lineCount;
 		
 		TextReader tr = new StreamReader(filepath);
 		
@@ -272,24 +278,34 @@ public class Config{
 			points[i] = int.Parse(s[6], CultureInfo.InvariantCulture.NumberFormat);
 		}
 	}
+
+    public int getCount() {
+        return count;
+    }
 	
-	public string[] getTypes(){
-		return type;
+	public string getTypes(int iType){
+		return type[iType];
 	}
 	
-	public float[,] getSize(){
-		return size;
+	public float[] getSize(int iType){
+		float[] retSize = new float[2];
+		retSize[0] = size[0,iType];
+		retSize[1] = size[1,iType];
+		return retSize;
 	}
 	
-	public float[,] getSpeed(){
-		return speed;
+	public float[] getSpeed(int iType){
+		float[] retSpeed = new float[2];
+		retSpeed[0] = speed[0,iType];
+		retSpeed[1] = speed[1,iType];
+		return retSpeed;
 	}
 	
-	public int[] getHealth(){
-		return health;
+	public int getHealth(int iType){
+		return health[iType];
 	}
 	
-	public int[] getPoints(){
-		return points;
+	public int getPoints(int iType){
+		return points[iType];
 	}
 }

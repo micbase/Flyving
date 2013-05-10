@@ -9,8 +9,12 @@ public class Player : MonoBehaviour {
 	
 	public GameObject projectilePrefab;
 	GameObject oBubble;
+	
+	public int iHealth;
 
 	void Start () {
+		
+		iHealth = 100;
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
