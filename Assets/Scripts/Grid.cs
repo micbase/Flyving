@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Globalization;
 
 public class Grid : MonoBehaviour {
 	
@@ -145,7 +146,7 @@ public abstract class Base {
 	protected int iStatus;
 	protected float fSpeed;
 	protected int iDirection;
-	protected List<string> objectTypes;
+	protected Config objectDetails;
 	
 	float leftInitial = -13;
 	float rightInitial = 13;
@@ -153,8 +154,7 @@ public abstract class Base {
 	float screenRight = 14;
 	
 	public Base(float top, float bottom) {
-		objectTypes = new List<string>();
-		iType = generateType(top, bottom);
+		//iType = generateType(top, bottom);
 		iDirection = Random.Range(0, 2);
 		
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -196,30 +196,30 @@ public abstract class Base {
 			}
 		}
 	}
+	protected abstract int generateType(float top, float bottom, Config oDetails);
+	//int generateType(float top, float bottom);// { return 0; }
 	
-	protected abstract int generateType(float top, float bottom);// { return 0; }
-	
-	protected abstract List<string> readTypes(); //returns the type of objects (e.g. fish, boxes)
+	//protected abstract List<string> readTypes(); //returns the type of objects (e.g. fish, boxes)
 	
 	public void whenCollide() {}
-	
-	
 }
 
 public class Creature : Base {
 	
 	public Creature(float top, float bottom) : base(top, bottom) {
-		
+		objectDetails = new Config("Assets/Resources/allfish.txt");
 		obj.tag = "Creature";
 		iStatus = 1;
 		
-		string type = readTypes()[iType];
+		iType=generateType(top,bottom,objectDetails);
 		
-		Material mat = Resources.Load("Materials/m" + type, typeof(Material)) as Material;
+		Material mat = Resources.Load("Materials/m" + objectDetails.getTypes()[iType], typeof(Material)) as Material;
 		obj.renderer.material = mat;
 		obj.transform.localScale = new Vector3(3, 1.5F, 1);
 		obj.transform.Rotate(0, 180, 0);
-		fSpeed = Random.Range(0.01F, 0.20F);
+		
+		//fSpeed = Random.Range(0.01F, 0.20F);
+		fSpeed = Random.Range(objectDetails.getSpeed()[0,iType], objectDetails.getSpeed()[1,iType]);
 
 	}
 	
@@ -230,15 +230,69 @@ public class Creature : Base {
 		}
 	}
 		
-	protected override int generateType(float top, float bottom) {
-		return 0;
+	protected override int generateType(float top, float bottom, Config oDetails) {
+		int index = Random.Range(0,oDetails.getTypes().Length - 1);
+		return index;
 	}
 	
-	protected override List<string> readTypes(){
-		TextReader tr = new StreamReader("Assets/Resources/allfish.txt");
-		foreach(string fishType in tr.ReadLine().Split(',')){
-			objectTypes.Add(fishType);
+}
+
+
+public class Config{
+	//type,size(width,height),speed(low,high),health,points
+	string[] type;
+	float[,] size;
+	float[,] speed;
+	int[] health;
+	int[] points;
+	
+	public  Config(string filepath){
+		int lineCount = 0;
+		using (var reader = File.OpenText(filepath))
+		{
+		    while (reader.ReadLine() != null)
+		    {
+		        lineCount++;
+		    }
 		}
-		return objectTypes;
+		
+		type = new string[lineCount];
+		size = new float[2,lineCount];
+		speed = new float[2,lineCount];
+		health = new int[lineCount];
+		points = new int[lineCount];
+		
+		TextReader tr = new StreamReader(filepath);
+		
+		for(int i=0; i<lineCount;i++){
+			string[] s = tr.ReadLine().Split(',');
+			type[i] = s[0];
+			size[0,i] = float.Parse(s[1],CultureInfo.InvariantCulture.NumberFormat);
+			size[1,i] = float.Parse(s[2],CultureInfo.InvariantCulture.NumberFormat);
+			speed[0,i] = float.Parse(s[3],CultureInfo.InvariantCulture.NumberFormat);
+			speed[1,i] = float.Parse(s[4],CultureInfo.InvariantCulture.NumberFormat);
+			health[i] = int.Parse(s[5],CultureInfo.InvariantCulture.NumberFormat);
+			points[i] = int.Parse(s[6], CultureInfo.InvariantCulture.NumberFormat);
+		}
+	}
+	
+	public string[] getTypes(){
+		return type;
+	}
+	
+	public float[,] getSize(){
+		return size;
+	}
+	
+	public float[,] getSpeed(){
+		return speed;
+	}
+	
+	public int[] getHealth(){
+		return health;
+	}
+	
+	public int[] getPoints(){
+		return points;
 	}
 }
