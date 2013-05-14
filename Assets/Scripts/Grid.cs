@@ -218,7 +218,7 @@ public class Creature : Base {
 		
 		Material mat = Resources.Load("Materials/m" + oCDetails.getTypes(iType), typeof(Material)) as Material;
 		obj.renderer.material = mat;
-		obj.transform.localScale = new Vector3(3, 1.5F, 1);
+		obj.transform.localScale = new Vector3(3, 1.5F, 0.001F);
 		obj.transform.Rotate(0, 180, 0);
 		
 		fSpeed = Random.Range(oCDetails.getSpeed(iType)[0], oCDetails.getSpeed(iType)[1]);
