@@ -153,10 +153,10 @@ public abstract class Base {
 	protected int iType;
 	protected int iDirection;
 	
-	float leftInitial = -13;
-	float rightInitial = 13;
-	float screenLeft = -14;
-	float screenRight = 14;
+	float leftInitial = -17;
+	float rightInitial = 17;
+	float screenLeft = -18;
+	float screenRight = 18;
 	
 	public Base(float top, float bottom) {
 		//iType = generateType(top, bottom);
@@ -188,38 +188,45 @@ public abstract class Base {
 	public void Update() {
 		
 		if (iStatus == ObjStatus.Normal) {
-			if (iDirection == 1)
+			if (iDirection == 0)
 				obj.transform.Translate(fSpeed, 0, 0);
 			else
 				obj.transform.Translate((-1) * fSpeed, 0, 0);
 			
 			if (obj.transform.localPosition.x > screenRight) {
-				iDirection = 1;
+				changeDirection(1);
 			}
 			else if (obj.transform.localPosition.x < screenLeft) {
-				iDirection = 0;
+				changeDirection(0);
 			}
 		}
 	}
 	protected abstract int generateType(float top, float bottom, Config oDetails);
+	protected abstract void changeDirection(int newDirection);
 	public abstract void whenCollide();
 }
 
 public class Creature : Base {
 	
 	int iHealth;
+	Config oCDetails;
 	
-	public Creature(float top, float bottom, Config oCDetails) : base(top, bottom) {
+	public Creature(float top, float bottom, Config details) : base(top, bottom) {
 		
 		obj.tag = "Creature";
+		oCDetails = details;
 		iStatus = ObjStatus.Normal;
 		iType = generateType(top, bottom, oCDetails);
 		iHealth = oCDetails.getHealth(iType);
 		
-		Material mat = Resources.Load("Materials/m" + oCDetails.getTypes(iType), typeof(Material)) as Material;
+		Material mat;
+		if (iDirection == 1)
+			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
+		else
+			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
+
 		obj.renderer.material = mat;
-		obj.transform.localScale = new Vector3(3, 1.5F, 0.001F);
-		obj.transform.Rotate(0, 180, 0);
+		obj.transform.localScale = new Vector3(oCDetails.getSize(iType)[0], oCDetails.getSize(iType)[1], 0.001F);
 		
 		fSpeed = Random.Range(oCDetails.getSpeed(iType)[0], oCDetails.getSpeed(iType)[1]);
 	}
@@ -230,9 +237,21 @@ public class Creature : Base {
 			Debug.Log("die");
 		}
 	}
+	
+	protected override void changeDirection(int newDirection) {
+		iDirection = newDirection;
 		
-	protected override int generateType(float top, float bottom, Config oDetails) {
-		int index = Random.Range(0,oDetails.getCount() - 1);
+		Material mat;
+		if (iDirection == 1)
+			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
+		else
+			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
+		
+		obj.renderer.material = mat;
+	}
+		
+	protected override int generateType(float top, float bottom, Config details) {
+		int index = Random.Range(0, details.getCount() - 1);
 		return index;
 	}
 	
