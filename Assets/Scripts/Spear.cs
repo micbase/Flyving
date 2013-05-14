@@ -6,12 +6,10 @@ public class Spear : MonoBehaviour {
 	public float SpearSpeed;
 	private Transform myTransform;
 	GameObject oCamera;
-	GameObject oPlayer;
 	
 	// Use this for initialization
 	void Start () {
 		oCamera = GameObject.Find ("Main Camera");
-		oPlayer = GameObject.Find ("Player");
 		myTransform = gameObject.transform;
 	}
 	
@@ -24,10 +22,12 @@ public class Spear : MonoBehaviour {
 		}
 	}
 	
-	void OnTriggerEnter(Collider other) {
-		if (other.gameObject != oPlayer) {
+	void OnTriggerEnter(Collider collider) {
+		if (collider.gameObject.tag == "Creature") {
 			//Instantiate(blood, other.gameObject.transform.localPosition, Quaternion.identity);
-			Debug.Log ("Spear kill");
+			Destroy(this.gameObject);
+			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Spear);
 		}
 	}
 }

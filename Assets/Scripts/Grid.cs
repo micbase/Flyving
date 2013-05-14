@@ -8,7 +8,7 @@ public enum ObjStatus { Normal = 1, Stop, Invisiable };
 public enum CreatureType { Dolphin = 1 };
 public enum TreasureType { Gun = 1 };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown };
-public enum WeaponType { Gun = 1, Bomb };
+public enum WeaponType { Gun = 1, Bomb, Spear};
 
 public class Grid : MonoBehaviour {
 	
@@ -123,10 +123,9 @@ public class Grid : MonoBehaviour {
 		
 		public void applyWeapon(int objID, WeaponType weaponType) {
 		
-			if (hasCreature && oCreature.ObjID == objID) {
+			if (hasCreature) {
 				
-				if (weaponType == WeaponType.Gun)
-					oCreature.setStatus(ObjStatus.Invisiable);
+				oCreature.attackedBy(weaponType);
 			}
 		}
 		
@@ -229,6 +228,25 @@ public class Creature : Base {
 		obj.transform.localScale = new Vector3(oCDetails.getSize(iType)[0], oCDetails.getSize(iType)[1], 0.001F);
 		
 		fSpeed = Random.Range(oCDetails.getSpeed(iType)[0], oCDetails.getSpeed(iType)[1]);
+	}
+	
+	public void attackedBy(WeaponType weaponType) {
+		
+		Dashboard dashBoard = GameObject.Find("Main Camera").GetComponent("Dashboard") as Dashboard;
+		dashBoard.iScore += oCDetails.getPoints(iType);
+			
+		if (weaponType == WeaponType.Gun) {
+			iHealth -= 5;
+		}
+		else if (weaponType == WeaponType.Spear) {
+			iHealth -= 10;
+		}
+		else if (weaponType == WeaponType.Bomb) {
+			iHealth -= 100;
+		}
+		
+		if (iHealth <= 0)
+			base.setStatus(ObjStatus.Invisiable);
 	}
 	
 	public override void whenCollide() {

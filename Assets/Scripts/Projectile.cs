@@ -4,7 +4,7 @@ using System.Collections;
 public class Projectile : MonoBehaviour {
 	
 	public float projectileSpeed;
-	private Transform myTransform;
+	Transform myTransform;
 	GameObject oCamera;
 	
 	// Use this for initialization
@@ -26,7 +26,7 @@ public class Projectile : MonoBehaviour {
 				
 		if (collider.gameObject.tag == "Creature") {
 			
-			Grid screenGrid =  GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
+			Grid screenGrid = oCamera.GetComponent("Grid") as Grid;
 			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Gun);
 			Destroy(this.gameObject);
 		}
