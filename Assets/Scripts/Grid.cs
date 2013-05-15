@@ -4,28 +4,49 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 
-public enum ObjStatus { Normal = 1, Stop, Invisiable };
+public enum ObjStatus { Normal = 1, Stop, Invisible };
 public enum CreatureType { Dolphin = 1 };
 public enum TreasureType { Gun = 1 };
-public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown };
+public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum WeaponType { Gun = 1, Bomb, Spear};
 
 public class Grid : MonoBehaviour {
 	
+	public float gameSpeed = -0.2f;
+
 	int gridSize;
 	float gridMargin;
 	float gridHeight;
 	float currentHeight;
-	float initialHeight = -10;
-	
-	List<GridCell> gridArray;
+	float initialHeight = -15;
+	List<GridCell> gridArraySea;
+	List<GridCell> gridArraySky;
+
 	GameObject oPlayer;
-	GameDirection currentDirection;
+	GameObject oCamera;
+	
+	GameObject oWater;
+	GameObject oBackWater1;
+	GameObject oBackWater2;
+	
 	Config[] objectDetails;
+	GameDirection currentDirection;
+		
+	float colorspeed = 0.1f;
+	float Acolor = 0.0f;
+	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
+	int n=2;
+	
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
+		oCamera = GameObject.Find("Main Camera");
+		
+		oWater = GameObject.Find ("backPlane");
+		oBackWater1 = GameObject.Find ("Water2");
+		oBackWater2 = GameObject.Find ("Water3");
+		
 		objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
 		
@@ -36,7 +57,8 @@ public class Grid : MonoBehaviour {
 		currentHeight = initialHeight;
 		currentDirection = GameDirection.DivingDown;
 		
-		gridArray = new List<GridCell>();
+		gridArraySea = new List<GridCell>();
+		gridArraySky = new List<GridCell>();
 		GenerateGrid();
 	}
 	
@@ -44,10 +66,63 @@ public class Grid : MonoBehaviour {
 		
 		float startPoint;
 		float endPoint;
-		int iStart;
-		int iEnd;
+		int iStart = 0;
+		int iEnd = 0;
+		
+		//Update camera and background
+		oCamera.transform.Translate(0, gameSpeed, 0);	
+		oWater.transform.Translate(0, 0, gameSpeed / 3);
+		
+		if(oWater.transform.localPosition.y>=-100)
+		{
+			oBackWater1.transform.localPosition=new Vector3(0,-50,2);
+			oBackWater2.transform.localPosition=new Vector3(0,-100,2);
+		}
+		if(gameSpeed<0)
+		{
+			if(oWater.transform.localPosition.y<-50*n)
+			{
+				if(n%2==1)
+				{
+					oBackWater2.transform.localPosition=new Vector3(0,-50*(n+1),2);
+					n++;
+				}
+				else
+				{
+					oBackWater1.transform.localPosition=new Vector3(0,-50*(n+1),2);
+					n++;
+				}
+				
+			}
+		}
+		else
+		{
+			if(oWater.transform.localPosition.y>-50*(n-1))
+			{
+				if(n%2==1)
+				{
+					oBackWater1.transform.localPosition=new Vector3(0,-50*(n-2),2);
+					n--;
+				}
+				else
+				{
+					oBackWater2.transform.localPosition=new Vector3(0,-50*(n-2),2);
+					n--;
+				}
+				
+			}
+		}
+		
+		if (Acolor<=200.0f)
+		{	
+			Acolor = Acolor+colorspeed;
+			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
+			oWater.renderer.material.color = mycolor;
+		}
 
-		if (currentDirection == GameDirection.DivingDown) {
+		//Update the creatures inside the grid.
+		if (currentDirection == GameDirection.DivingDown ||
+			currentDirection == GameDirection.DivingUp) {
 				
 			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
 			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
@@ -57,46 +132,88 @@ public class Grid : MonoBehaviour {
 			if (startPoint >= 0)
 				iStart = 0;
 			
-			if (iEnd > gridArray.Count) {
+			if (iEnd > gridArraySea.Count) {
 				GenerateGrid();
-				iEnd = gridArray.Count;
+				iEnd = gridArraySea.Count;
 			}
-		}
-		else {
-			//fake code!!
-			iStart = 0;
-			iEnd = gridSize;
+			
+			for (int i = iStart; i < iEnd; i++ ) {
+				gridArraySea[i].Update();
+			}
 		}	
-		
-		for (int i = iStart; i < iEnd; i++ ) {
-			gridArray[i].Update();
+		else if (currentDirection == GameDirection.FlyingUp ||
+			currentDirection == GameDirection.FlyingDown) {
+			
+			startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
+			endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
+			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+			
+			if (startPoint <= 0)
+				iStart = 0;
+			
+			if (iEnd > gridArraySky.Count) {
+				GenerateGrid();
+				iEnd = gridArraySky.Count;
+			}
+			
+			for (int i = iStart; i < iEnd; i++ ) {
+				gridArraySky[i].Update();
+			}
+			
 		}
 	}
-
+	
+	public GameDirection CurrentDirection {
+		get {
+			return currentDirection;
+		}
+		
+		set {
+			currentDirection = value;
+			
+			if (value == GameDirection.FlyingUp)
+				currentHeight = Mathf.Abs(initialHeight);
+			
+			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp)
+				gameSpeed = Mathf.Abs(gameSpeed);
+			else if (value == GameDirection.FlyingDown || value == GameDirection.DivingDown)
+				gameSpeed = (-1) * Mathf.Abs(gameSpeed);
+			else
+				gameSpeed = 0;
+		}
+	}
 	
 	void GenerateGrid() {
 		
-		for (int i = 0; i < gridSize; i++) {
-			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
-			currentHeight -= gridMargin + gridHeight;
+		if (currentDirection == GameDirection.DivingDown) {
+			for (int i = 0; i < gridSize; i++) {
+				gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
+				currentHeight -= gridMargin + gridHeight;
+			}
 		}
-	}
-	
-	public void setDirection(GameDirection direction) {
-		
-		currentDirection = direction;
+		else if (currentDirection == GameDirection.FlyingUp) {
+			for (int i = 0; i < gridSize; i++) {
+				gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails));
+				currentHeight += gridMargin + gridHeight;
+			}
+		}
 	}
 	
 	public void applyWeapon(int objID, float top, WeaponType weaponType) {
 		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].applyWeapon(objID, weaponType);
+		if (currentDirection == GameDirection.DivingDown) {
+			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
+			gridArraySea[index].applyWeapon(objID, weaponType);
+		}
 	}
 		
 	public void whenCollide(int objID, float top, int type) {
 		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].whenCollide(objID, type);
+		if (currentDirection == GameDirection.DivingDown) {
+			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
+			gridArraySea[index].whenCollide(objID, type);
+		}
 	}
 	
 	public class GridCell {
@@ -171,7 +288,7 @@ public abstract class Base {
 		
 		iStatus = status;
 		
-		if (iStatus == ObjStatus.Invisiable){
+		if (iStatus == ObjStatus.Invisible){
 			obj.renderer.enabled = false;
 			obj.collider.enabled = false;
 		}
@@ -248,12 +365,12 @@ public class Creature : Base {
 		}
 		
 		if (iHealth <= 0)
-			base.setStatus(ObjStatus.Invisiable);
+			base.setStatus(ObjStatus.Invisible);
 	}
 	
 	public override void whenCollide() {
 		if (iStatus == ObjStatus.Normal) {
-			Application.LoadLevel("GameOver");
+			//Application.LoadLevel("GameOver");
 			Debug.Log("die");
 		}
 	}

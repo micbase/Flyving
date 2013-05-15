@@ -5,38 +5,42 @@ public class Player : MonoBehaviour {
 	
 	GameObject oPlayer;
 	GameObject oCamera;
-	GameObject oWater;
-	GameObject oBubble;
-	GameObject oBackWater1;
-	GameObject oBackWater2;
+	GameObject oBubble;	
+	
+	Grid grid;
 
 	public GameObject projectilePrefab;
 	public GameObject Bomb;
 	public GameObject Spear;
 	
-	public int iHealth;
-	public float playerspeed = -0.2f;
-	
-	float colorspeed = 0.1f;
-	float Acolor = 0.0f;
-	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
-	int n=2;
-
+	public int iLife;
+	public float iOxygen;
+	public float iFuel;
 
 	void Start () {
 		
-		iHealth = 100;
+		iLife = 3;
+		iOxygen = 100;
+		iFuel = 15;
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
 		oBubble = GameObject.Find("Bubbles");
-		oWater = GameObject.Find ("backPlane");
-		oBackWater1 = GameObject.Find ("Water2");
-		oBackWater2 = GameObject.Find ("Water3");
+		
+		grid = oCamera.GetComponent("Grid") as Grid;
 	}
 	
 	void Update () {
-				
+		
+		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
+		oBubble.transform.Translate(0, grid.gameSpeed, 0);
+		
+		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp)
+			iOxygen -= Time.deltaTime;
+		
+		if (grid.CurrentDirection == GameDirection.FlyingUp)
+			iFuel -= Time.deltaTime;
+		
 		if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
 			oPlayer.transform.Translate(-0.5F, 0, 0);
 			oBubble.transform.Translate(-0.5F, 0, 0);
@@ -57,67 +61,31 @@ public class Player : MonoBehaviour {
 			oPlayer.transform.Translate(0, -0.3F, 0);
 			oBubble.transform.Translate(0, -0.3F, 0);
 		}
+		
 		if (Input.GetKeyDown(KeyCode.Tab))
 		{
-			playerspeed=playerspeed*(-1);
-			oPlayer.transform.Rotate(0,180.0f,0);
-		}
-			
-	
-		
-		oCamera.transform.Translate(0, playerspeed, 0);
-		oPlayer.transform.Translate(0, playerspeed, 0);
-		oBubble.transform.Translate(0, playerspeed, 0);
-		oWater.transform.Translate(0,0, -playerspeed);
-		if(oWater.transform.localPosition.y>=-100)
-		{
-			oBackWater1.transform.localPosition=new Vector3(0,-50,2);
-			oBackWater2.transform.localPosition=new Vector3(0,-100,2);
-		}
-		if(playerspeed<0)
-		{
-			if(oWater.transform.localPosition.y<-50*n)
-			{
-				if(n%2==1)
-				{
-					oBackWater2.transform.localPosition=new Vector3(0,-50*(n+1),2);
-					n++;
-				}
-				else
-				{
-					oBackWater1.transform.localPosition=new Vector3(0,-50*(n+1),2);
-					n++;
-				}
-				
+			if (grid.CurrentDirection == GameDirection.DivingDown) {
+				grid.CurrentDirection = GameDirection.DivingUp;
+				oPlayer.transform.Rotate(0,180.0f,0);
 			}
 		}
-		else
-		{
-			if(oWater.transform.localPosition.y>-50*(n-1))
-			{
-				if(n%2==1)
-				{
-					oBackWater1.transform.localPosition=new Vector3(0,-50*(n-2),2);
-					n--;
-				}
-				else
-				{
-					oBackWater2.transform.localPosition=new Vector3(0,-50*(n-2),2);
-					n--;
-				}
-				
-			}
-		}
-
-
 		
-		if (Acolor<=200.0f)
-		{	
-			Acolor = Acolor+colorspeed;
-			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
-			oWater.renderer.material.color = mycolor;
+		if (grid.CurrentDirection == GameDirection.DivingUp && oPlayer.transform.localPosition.y >= 0) {
+			grid.CurrentDirection = GameDirection.FlyingUp;
+			oBubble.renderer.enabled = false;
+			Debug.Log("change to flying up");
 		}
-
+		
+		if (grid.CurrentDirection == GameDirection.FlyingUp && iFuel <= 0) {
+			grid.CurrentDirection = GameDirection.FlyingDown;
+			//open parachute
+			Debug.Log("change to flying down");
+		}
+		
+		if (grid.CurrentDirection == GameDirection.FlyingDown && oPlayer.transform.localPosition.y <= 0) {
+			grid.CurrentDirection = GameDirection.GameOver;
+			Debug.Log("return to surface");
+		}
 		
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
