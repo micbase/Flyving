@@ -9,13 +9,9 @@ public class Bomb : MonoBehaviour {
 	public GameObject Explosion2;
 	public GameObject Explosion3;
 	GameObject oCamera;
-	GameObject oPlayer;
-	GameObject oWater;
 	
 	void Start () {
 		oCamera = GameObject.Find ("Main Camera");
-		oPlayer = GameObject.Find ("Player");
-		oWater = GameObject.Find ("backPlane");
 		myTransform = gameObject.transform;
 	}
 	
@@ -28,9 +24,7 @@ public class Bomb : MonoBehaviour {
 		}
 	}
 		
-	void OnTriggerEnter(Collider other) {
-
-        Debug.Log(other);
+	void OnTriggerEnter(Collider collider) {
 		
 		Vector3 exp_pos_1 = new Vector3(this.gameObject.transform.localPosition.x,this.gameObject.transform.localPosition.y,this.gameObject.transform.localPosition.z);
 		Vector3 exp_pos_2 = new Vector3(this.gameObject.transform.localPosition.x+2.0f,this.gameObject.transform.localPosition.y+2.0f,this.gameObject.transform.localPosition.z);
@@ -42,7 +36,10 @@ public class Bomb : MonoBehaviour {
 		Vector3 exp_pos_8 = new Vector3(this.gameObject.transform.localPosition.x-2.5f,this.gameObject.transform.localPosition.y,this.gameObject.transform.localPosition.z);
 		Vector3 exp_pos_9 = new Vector3(this.gameObject.transform.localPosition.x+2.5f,this.gameObject.transform.localPosition.y,this.gameObject.transform.localPosition.z);
 		
-		if (other.gameObject != oPlayer && other.gameObject != oWater) {
+		if (collider.gameObject.tag == "Creature") {
+			
+			Grid screenGrid = oCamera.GetComponent("Grid") as Grid;
+			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Bomb);
 			Destroy(this.gameObject);
 			Instantiate(Explosion1, exp_pos_1, Quaternion.identity);
 			Instantiate(Explosion2, exp_pos_1, Quaternion.identity);

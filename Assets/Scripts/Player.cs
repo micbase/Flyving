@@ -37,12 +37,12 @@ public class Player : MonoBehaviour {
 	
 	void Update () {
 				
-		if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -15) {
+		if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
 			oPlayer.transform.Translate(-0.5F, 0, 0);
 			oBubble.transform.Translate(-0.5F, 0, 0);
 		}
 		
-		else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 15) {
+		else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
 			oPlayer.transform.Translate(0.5F, 0, 0);
 			oBubble.transform.Translate(0.5F, 0, 0);
 		}
