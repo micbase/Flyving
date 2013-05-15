@@ -20,7 +20,7 @@ public class Player : MonoBehaviour {
 	void Start () {
 		
 		iLife = 3;
-		iOxygen = 100;
+		iOxygen = 30;
 		iFuel = 15;
 		
 		oPlayer = GameObject.Find("Player");
@@ -35,8 +35,14 @@ public class Player : MonoBehaviour {
 		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
 		oBubble.transform.Translate(0, grid.gameSpeed, 0);
 		
-		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp)
+		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
 			iOxygen -= Time.deltaTime;
+			
+			if (iOxygen <= 0) {
+				Application.LoadLevel("GameOver");
+				Debug.Log("run out of oxygen");
+			}
+		}
 		
 		if (grid.CurrentDirection == GameDirection.FlyingUp)
 			iFuel -= Time.deltaTime;
