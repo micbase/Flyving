@@ -42,7 +42,9 @@ public class Dashboard : MonoBehaviour {
 		currenty=oOxygen.transform.localPosition.y+0.000035f;
 		currentz=oOxygen.transform.localPosition.z;
 		oOxygen.transform.localPosition=new Vector3(currentx,currenty,currentz);
-		
+		if(timeCount <= 0.0f){
+			Application.LoadLevel("GameOver");
+		}
 		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, height*timeCount*3.33F/100);
 	}
 }

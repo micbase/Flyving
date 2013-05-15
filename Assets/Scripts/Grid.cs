@@ -172,8 +172,10 @@ public abstract class Base {
 		
 		iStatus = status;
 		
-		if (iStatus == ObjStatus.Invisiable)
+		if (iStatus == ObjStatus.Invisiable){
 			obj.renderer.enabled = false;
+			obj.collider.enabled = false;
+		}
 		else
 			obj.renderer.enabled = true;
 	}
@@ -233,7 +235,7 @@ public class Creature : Base {
 	
 	public override void whenCollide() {
 		if (iStatus == ObjStatus.Normal) {
-			//Application.LoadLevel("GameOver");
+			Application.LoadLevel("GameOver");
 			Debug.Log("die");
 		}
 	}
@@ -251,7 +253,14 @@ public class Creature : Base {
 	}
 		
 	protected override int generateType(float top, float bottom, Config details) {
-		int index = Random.Range(0, details.getCount() - 1);
+		int index = 0;
+		
+		if(top >= -125.0){
+			index = Random.Range(0, details.getCount() - 4);
+		}
+		else{
+			index = Random.Range(4,details.getCount() - 1);
+		}
 		return index;
 	}
 	
