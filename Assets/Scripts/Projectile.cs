@@ -27,7 +27,7 @@ public class Projectile : MonoBehaviour {
 		if (collider.gameObject.tag == "Creature") {
 			
 			Grid screenGrid = oCamera.GetComponent("Grid") as Grid;
-			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Gun);
+			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition, WeaponType.Gun);
 			Destroy(this.gameObject);
 		}
 	}

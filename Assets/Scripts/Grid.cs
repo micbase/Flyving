@@ -200,11 +200,35 @@ public class Grid : MonoBehaviour {
 		}
 	}
 	
-	public void applyWeapon(int objID, float top, WeaponType weaponType) {
+	public void applyWeapon(int objID, Vector3 pos, WeaponType weaponType) {
 		
 		if (currentDirection == GameDirection.DivingDown) {
-			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-			gridArraySea[index].applyWeapon(objID, weaponType);
+			
+			int index = Mathf.CeilToInt((initialHeight - pos.y) / (gridMargin + gridHeight)) - 1;
+
+			if (weaponType == WeaponType.Gun) {
+				gridArraySea[index].applyWeapon(objID, pos, weaponType);
+			}
+			else if (weaponType == WeaponType.Spear) {
+				
+				int iStart = Mathf.CeilToInt((initialHeight - oPlayer.transform.localPosition.y ) / (gridMargin + gridHeight)) - 1;
+				
+				for (int i = iStart; i <= index + 5; i++) {
+					gridArraySea[i].applyWeapon(objID, pos, weaponType);
+				}				
+			}
+			else if (weaponType == WeaponType.Bomb) {
+				
+				if (Vector3.Distance(oPlayer.transform.localPosition, pos) < 5) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("killed by bomb");
+				}
+				
+				for (int i = index - 5; i <= index + 5; i++) {
+					if (i >= 0)
+						gridArraySea[i].applyWeapon(objID, pos, weaponType);
+				}
+			}
 		}
 	}
 		
@@ -238,11 +262,31 @@ public class Grid : MonoBehaviour {
 				oCreature.Update();
 		}
 		
-		public void applyWeapon(int objID, WeaponType weaponType) {
-		
-			if (hasCreature) {
+		public void applyWeapon(int objID, Vector3 pos, WeaponType weaponType) {
+			
+			switch (weaponType) {
 				
-				oCreature.attackedBy(weaponType);
+			case WeaponType.Gun:
+				if (hasCreature) {
+					oCreature.attackedBy(weaponType);
+				}
+				break;
+				
+			case WeaponType.Spear:
+				if (hasCreature) {
+					if (Mathf.Abs(oCreature.getPosition().x - pos.x) < 1) {
+						oCreature.attackedBy(weaponType);
+					}
+				}
+				break;
+				
+			case WeaponType.Bomb:
+				if (hasCreature) {
+					if (Vector3.Distance(oCreature.getPosition(), pos) < 10) {
+						oCreature.attackedBy(weaponType);
+					}
+				}
+				break;
 			}
 		}
 		
@@ -253,7 +297,7 @@ public class Grid : MonoBehaviour {
 		
 		bool isGenerate(float top, float bottom) {
 			
-			return (Random.Range (0.0F, 1.0F) < 0.7);
+			return (Random.Range (0.0F, 1.0F) < 0.6);
 		}
 
 	}
@@ -301,6 +345,10 @@ public abstract class Base {
 		get {
 			return objID;
 		}
+	}
+	
+	public Vector3 getPosition() {
+		return obj.transform.localPosition;
 	}
 	
 	public void Update() {
@@ -366,6 +414,7 @@ public class Creature : Base {
 		
 		if (iHealth <= 0)
 			base.setStatus(ObjStatus.Invisible);
+			//base.setStatus(ObjStatus.Stop);
 	}
 	
 	public override void whenCollide() {

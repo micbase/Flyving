@@ -38,7 +38,7 @@ public class Dashboard : MonoBehaviour {
 	
 	void Update () {
 		
-		oScore.guiText.text = iScore.ToString("0");
+		oScore.guiText.text = "Score: " + iScore.ToString("0");
 		delta=Time.deltaTime*height*3.33F/100;
 		currentx=oOxygen.transform.localPosition.x;
 		currenty=oOxygen.transform.localPosition.y+0.000035f;
