@@ -289,7 +289,6 @@ public class Grid : MonoBehaviour {
 		}
 		
 		bool isGenerate(float top, float bottom) {
-			
 			return (Random.Range (0.0F, 1.0F) < 0.6);
 		}
 
@@ -426,17 +425,54 @@ public class Creature : Base {
 		else
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
 		
+		oCDetails.getTypes(iType).ToString();
+		
 		obj.renderer.material = mat;
 	}
 		
 	protected override int generateType(float top, float bottom, Config details) {
+		
 		int index = 0;
 		
-		if(top >= -125.0){
-			index = Random.Range(0, details.getCount() - 4);
+		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
+		int category = 0, firstDepth = -125, secondDepth = -250; 
+		
+		float randNum = Random.Range(0.0f, 1.0f);
+		
+		if(top > firstDepth){
+			small = 0.8f;
+			medium = 0.98f;
+			large = 1.0f;	
+		}
+		else if ((top < firstDepth) && (top > secondDepth)){
+			small = 0.4f;
+			medium = 0.9f;
+			large = 1.0f;
 		}
 		else{
-			index = Random.Range(4,details.getCount() - 1);
+			small = 0.1f;
+			medium = 0.4f;
+			large = 1.0f;
+		}
+			
+		
+		if(randNum < small)
+				category = 0;
+		else if ((randNum>small) && (randNum<medium))
+			category = 1;
+		else
+			category = 2;
+		
+		switch(category){
+			case 0: 
+				index =Random.Range(0, 2);
+				break;
+			case 1:
+				index = Random.Range(2,4);
+				break;
+			case 2:
+				index = Random.Range(4,7);
+				break;
 		}
 		return index;
 	}
