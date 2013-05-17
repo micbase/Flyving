@@ -7,7 +7,7 @@ public class Dashboard : MonoBehaviour {
 	
 	GameObject oScore;
 	GameObject oOxygen;
-	float timeCount;
+	public static float timeCount;
 	private float height;
 	private float width;
 	private float x;
@@ -45,4 +45,9 @@ public class Dashboard : MonoBehaviour {
 		
 		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, height*timeCount*3.33F/100);
 	}
+	
+	public void reset_oxygen () {
+		timeCount = 30;
+	}
+	
 }

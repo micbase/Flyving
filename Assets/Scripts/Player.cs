@@ -11,8 +11,10 @@ public class Player : MonoBehaviour {
 	public GameObject projectilePrefab;
 	public GameObject Bomb;
 	public GameObject Spear;
-	
 	public int iHealth;
+	public WeaponType currentWeapon;
+	public int bomb_num = 0;
+	public int spear_num = 0;
 	
 	float colorspeed = 0.1f;
 	float Acolor = 0.0f;
@@ -27,6 +29,7 @@ public class Player : MonoBehaviour {
 		oCamera = GameObject.Find("Main Camera");
 		oBubble = GameObject.Find("Bubbles");
 		oWater = GameObject.Find ("backPlane");
+		currentWeapon = WeaponType.noWeapon;
 	}
 	
 	void Update () {
@@ -64,17 +67,25 @@ public class Player : MonoBehaviour {
 			oWater.renderer.material.color = mycolor;
 		}
 
-		
+		//using weapon
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+			if (currentWeapon == WeaponType.Gun) {
+				Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+			}
 		}
 		
 		if (Input.GetKeyDown(KeyCode.B)) {
-			Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
+			if (currentWeapon == WeaponType.Bomb && bomb_num>0) {
+				Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
+				bomb_num --;
+			}
 		}
 		
 		if (Input.GetKeyDown(KeyCode.V)) {
-			Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
+			if (currentWeapon == WeaponType.Spear && spear_num>0) {
+				Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
+				spear_num --;
+			}
 		}
 		
 		GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon") as GameObject[];
@@ -90,6 +101,32 @@ public class Player : MonoBehaviour {
 			
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
 			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 1);
+		}
+		if (collider.gameObject.tag == "TreasureBox") {
+			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+			int weapon = screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 0);
+			switch (weapon) {
+			case 1:
+				currentWeapon = WeaponType.Gun;
+				break;
+			case 2:
+				currentWeapon = WeaponType.Bomb;
+				bomb_num = 3;
+				break;
+			case 3:
+				currentWeapon = WeaponType.Spear;
+				spear_num = 5;
+				break;
+			default:
+				currentWeapon = WeaponType.noWeapon;
+				break;
+			}
+		}
+		
+		if (collider.gameObject.tag == "OxygenCan") {
+				Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+				screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
+				Dashboard.timeCount = 30.0f;
 		}
 	}	
 	

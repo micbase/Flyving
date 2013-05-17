@@ -25,7 +25,7 @@ public class Spear : MonoBehaviour {
 	void OnTriggerEnter(Collider collider) {
 		if (collider.gameObject.tag == "Creature") {
 			//Instantiate(blood, other.gameObject.transform.localPosition, Quaternion.identity);
-			Destroy(this.gameObject);
+			//Destroy(this.gameObject);
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
 			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Spear);
 		}

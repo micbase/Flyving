@@ -8,14 +8,14 @@ public enum ObjStatus { Normal = 1, Stop, Invisiable };
 public enum CreatureType { Dolphin = 1 };
 public enum TreasureType { Gun = 1 };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown };
-public enum WeaponType { Gun = 1, Bomb, Spear};
+public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon};
 
 public class Grid : MonoBehaviour {
 	
 	int gridSize;
-	float gridMargin;
-	float gridHeight;
-	float currentHeight;
+	float gridMargin; //distance between two margins
+	float gridHeight; 
+	float currentHeight; 
 	float initialHeight = -10;
 	
 	List<GridCell> gridArray;
@@ -93,10 +93,10 @@ public class Grid : MonoBehaviour {
 		gridArray[index].applyWeapon(objID, weaponType);
 	}
 		
-	public void whenCollide(int objID, float top, int type) {
+	public int whenCollide(int objID, float top, int type) {
 		
 		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].whenCollide(objID, type);
+		return gridArray[index].whenCollide(objID, type);
 	}
 	
 	public class GridCell {
@@ -105,6 +105,10 @@ public class Grid : MonoBehaviour {
 		float bottomPosition;
 		bool hasCreature = false;
 		Creature oCreature = null;
+		TreasureBox oTreasure = null;
+		OxygenCan oOxygen = null;
+		bool hasTreasure = false;
+		bool hasOxygen = false;
 		
 		public GridCell(float top, float bottom, Config[] objectDetail) {
 			topPosition = top;
@@ -113,6 +117,14 @@ public class Grid : MonoBehaviour {
 			hasCreature = isGenerate(topPosition, bottomPosition);
 			if (hasCreature)
 				oCreature = new Creature(topPosition, bottomPosition, objectDetail[0]);
+			hasTreasure = (Random.Range (0.0f,1.0f) < 0.04f);
+			if (hasTreasure) 
+				oTreasure = new TreasureBox(topPosition, bottomPosition);
+			
+			hasOxygen = (Random.Range (0.0f,1.0f) < 0.06f);
+			if (hasOxygen) {
+				oOxygen = new OxygenCan(topPosition, bottomPosition);
+			}
 		}
 		
 		public void Update() {
@@ -129,10 +141,21 @@ public class Grid : MonoBehaviour {
 			}
 		}
 		
-		public void whenCollide(int objID, int type) {
-		
-			oCreature.whenCollide();
-		}
+		public int whenCollide(int objID, int type) {
+			if (type==1) {
+				oCreature.whenCollide();
+				return 0;
+			} else if (type==0) {
+				Debug.Log ("I ran into a treasure box! Yay!");	
+				oTreasure.whenCollide();
+				return oTreasure.GetTreasure();
+			} else if (type == 2) {
+				oOxygen.whenCollide();
+				return 0;	
+			} else {
+				return -1;	
+			}
+		} 
 		
 		bool isGenerate(float top, float bottom) {
 			
@@ -171,10 +194,14 @@ public abstract class Base {
 		
 		iStatus = status;
 		
-		if (iStatus == ObjStatus.Invisiable)
+		if (iStatus == ObjStatus.Invisiable){
 			obj.renderer.enabled = false;
-		else
+			obj.collider.enabled = false;
+		}
+		else {
 			obj.renderer.enabled = true;
+			obj.renderer.enabled = true;	
+		}
 	}
 	
 	public int ObjID {
@@ -205,6 +232,50 @@ public abstract class Base {
 	public abstract void whenCollide();
 }
 
+public class TreasureBox: Base {
+	int weaponContained;
+	
+	public TreasureBox(float top, float bottom) : base(top, bottom) {
+		obj.tag = "TreasureBox";
+		iStatus = ObjStatus.Stop;
+		weaponContained = (int)Random.Range(1,4);		
+		Material mat = Resources.Load ("Materials/TreasureBox", typeof(Material)) as Material;
+		obj.renderer.material = mat;		
+		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
+		fSpeed = 0;
+	}
+	
+	public int GetTreasure() {
+		return weaponContained;
+	}
+	
+	public override void whenCollide() {
+			base.setStatus(ObjStatus.Invisiable);
+	}
+	
+	protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
+	protected override void changeDirection(int newDirection) {}
+}
+
+//Oxygen can class
+public class OxygenCan: Base {
+	
+	public OxygenCan(float top, float bottom) : base(top, bottom) {
+		obj.tag = "OxygenCan";
+		iStatus = ObjStatus.Stop;		
+		//Material mat = Resources.Load ("Materials/OxygenCan", typeof(Material)) as Material;
+		//obj.renderer.material = mat;		
+		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
+	}
+	
+	public override void whenCollide() {
+			base.setStatus(ObjStatus.Invisiable);
+	}
+	
+	protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
+	protected override void changeDirection(int newDirection) {}
+}
+
 public class Creature : Base {
 	
 	int iHealth;
@@ -219,10 +290,13 @@ public class Creature : Base {
 		iHealth = oCDetails.getHealth(iType);
 		
 		Material mat;
-		if (iDirection == 1)
+		if (iDirection == 1){
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
-		else
+			Debug.Log ("Current material:  " + mat.ToString());
+		}
+		else {
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
+		}
 
 		obj.renderer.material = mat;
 		obj.transform.localScale = new Vector3(oCDetails.getSize(iType)[0], oCDetails.getSize(iType)[1], 0.001F);
