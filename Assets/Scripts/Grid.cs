@@ -242,11 +242,12 @@ public class Grid : MonoBehaviour {
 		float topPosition;
 		float bottomPosition;
 		bool hasCreature = false;
+		bool hasTreasure = false;
+		bool hasOxygen = false;
 		Creature oCreature = null;
 		TreasureBox oTreasure = null;
 		OxygenCan oOxygen = null;
-		bool hasTreasure = false;
-		bool hasOxygen = false;
+
 		
 		public GridCell(float top, float bottom, Config[] objectDetail) {
 			topPosition = top;
@@ -255,6 +256,7 @@ public class Grid : MonoBehaviour {
 			hasCreature = isGenerate(topPosition, bottomPosition);
 			if (hasCreature)
 				oCreature = new Creature(topPosition, bottomPosition, objectDetail[0]);
+			
 			hasTreasure = (Random.Range (0.0f,1.0f) < 0.04f);
 			if (hasTreasure) 
 				oTreasure = new TreasureBox(topPosition, bottomPosition);
