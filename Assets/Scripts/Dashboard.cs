@@ -7,7 +7,10 @@ public class Dashboard : MonoBehaviour {
 	
 	GameObject oScore;
 	GameObject oOxygen;
-	public static float timeCount;
+
+	
+	Player player;
+
 	private float height;
 	private float width;
 	private float x;
@@ -22,10 +25,11 @@ public class Dashboard : MonoBehaviour {
 		oScore = GameObject.Find("Score");
 		oOxygen = GameObject.Find("Oxygenbar");
 		
+		player = GameObject.Find("Player").GetComponent("Player") as Player;
+		
 		iScore = 0;
 		
 		oScore.guiText.text = "30";
-		timeCount = 30;
 		
 		height = oOxygen.guiTexture.pixelInset.height;
 		width = oOxygen.guiTexture.pixelInset.width;
@@ -35,19 +39,15 @@ public class Dashboard : MonoBehaviour {
 	
 	void Update () {
 		
-		timeCount -= Time.deltaTime;
-		oScore.guiText.text = iScore.ToString("0");
+		oScore.guiText.text = "Score: " + iScore.ToString("0");
 		delta=Time.deltaTime*height*3.33F/100;
 		currentx=oOxygen.transform.localPosition.x;
 		currenty=oOxygen.transform.localPosition.y+0.000035f;
 		currentz=oOxygen.transform.localPosition.z;
 		oOxygen.transform.localPosition=new Vector3(currentx,currenty,currentz);
+
 		
-		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, height*timeCount*3.33F/100);
-	}
-	
-	public void reset_oxygen () {
-		timeCount = 30;
+		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, height*player.iOxygen*3.33F/100);
 	}
 	
 }

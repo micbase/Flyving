@@ -4,28 +4,47 @@ using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 
-public enum ObjStatus { Normal = 1, Stop, Invisiable };
+public enum ObjStatus { Normal = 1, Stop, Invisible };
 public enum CreatureType { Dolphin = 1 };
 public enum TreasureType { Gun = 1 };
-public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown };
+
+public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon};
 
 public class Grid : MonoBehaviour {
 	
+	public float gameSpeed = -0.2f;
+	float baseSpeed = -0.2f;
+
 	int gridSize;
-	float gridMargin; //distance between two margins
-	float gridHeight; 
-	float currentHeight; 
-	float initialHeight = -10;
-	
-	List<GridCell> gridArray;
+	float gridMargin;
+	float gridHeight;
+	float currentHeight;
+	float currentBGHeight;
+	float initialHeight = -15;
+	float initialBGHeight = -26.6f;
+	List<GridCell> gridArraySea;
+	List<GridCell> gridArraySky;
+
 	GameObject oPlayer;
-	GameDirection currentDirection;
+	GameObject oCamera;
+	
+	GameObject oWater;
+	
 	Config[] objectDetails;
+	GameDirection currentDirection;
+		
+	float colorspeed = 0.1f;
+	float Acolor = 0.0f;
+	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);	
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
+		oCamera = GameObject.Find("Main Camera");
+		
+		//oWater = GameObject.Find ("backPlane");
+		
 		objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
 		
@@ -34,9 +53,11 @@ public class Grid : MonoBehaviour {
 		gridHeight = 1;
 		
 		currentHeight = initialHeight;
+		currentBGHeight = initialBGHeight;
 		currentDirection = GameDirection.DivingDown;
 		
-		gridArray = new List<GridCell>();
+		gridArraySea = new List<GridCell>();
+		gridArraySky = new List<GridCell>();
 		GenerateGrid();
 	}
 	
@@ -44,59 +65,176 @@ public class Grid : MonoBehaviour {
 		
 		float startPoint;
 		float endPoint;
-		int iStart;
-		int iEnd;
+		int iStart = 0;
+		int iEnd = 0;
+		
+		//Update camera and background
+		oCamera.transform.Translate(0, gameSpeed, 0);	
+		//oWater.transform.Translate(0, 0, gameSpeed / 3);
+		
+		/*
+		if (Acolor<=200.0f)
+		{	
+			Acolor = Acolor+colorspeed;
+			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
+			oWater.renderer.material.color = mycolor;
+		}
+		*/
 
-		if (currentDirection == GameDirection.DivingDown) {
+		//Update the creatures inside the grid.
+		if (currentDirection == GameDirection.DivingDown ||
+			currentDirection == GameDirection.DivingUp) {
 				
-			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
-			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
+			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
+			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
 			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
 			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
 			
 			if (startPoint >= 0)
 				iStart = 0;
 			
-			if (iEnd > gridArray.Count) {
+			if (iEnd > gridArraySea.Count) {
 				GenerateGrid();
-				iEnd = gridArray.Count;
+				iEnd = gridArraySea.Count;
 			}
-		}
-		else {
-			//fake code!!
-			iStart = 0;
-			iEnd = gridSize;
+			
+			for (int i = iStart; i < iEnd; i++ ) {
+				gridArraySea[i].Update();
+			}
 		}	
-		
-		for (int i = iStart; i < iEnd; i++ ) {
-			gridArray[i].Update();
+		else if (currentDirection == GameDirection.FlyingUp ||
+			currentDirection == GameDirection.FlyingDown) {
+			
+			startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
+			endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
+			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+			
+			if (startPoint <= 0)
+				iStart = 0;
+			
+			if (iEnd > gridArraySky.Count) {
+				GenerateGrid();
+				iEnd = gridArraySky.Count;
+			}
+			
+				for (int i = iStart; i < iEnd; i++ ) {
+				gridArraySky[i].Update();
+			}
+			
 		}
 	}
-
+	
+	public GameDirection CurrentDirection {
+		get {
+			return currentDirection;
+		}
+		
+		set {
+			currentDirection = value;
+			
+			if (value == GameDirection.FlyingUp) {
+				currentHeight = Mathf.Abs(initialHeight);
+				currentBGHeight = Mathf.Abs(initialBGHeight);
+			}
+			
+			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp) {
+				gameSpeed = Mathf.Abs(baseSpeed) * 3;
+			}
+			else if (value == GameDirection.FlyingDown || value == GameDirection.DivingDown)
+				gameSpeed = (-1) * Mathf.Abs(baseSpeed);
+			else
+				gameSpeed = 0;
+		}
+	}
 	
 	void GenerateGrid() {
 		
-		for (int i = 0; i < gridSize; i++) {
-			gridArray.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
-			currentHeight -= gridMargin + gridHeight;
+		if (currentDirection == GameDirection.DivingDown) {
+			for (int i = 0; i < gridSize; i++) {
+				gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
+				currentHeight -= gridMargin + gridHeight;
+			}
+			
+			while (currentBGHeight > currentHeight) {
+				GenerateBackground();
+			}
+		}
+		else if (currentDirection == GameDirection.FlyingUp) {
+			for (int i = 0; i < gridSize; i++) {
+				gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails));
+				currentHeight += gridMargin + gridHeight;
+			}
+			
+			while (currentBGHeight < currentHeight) {
+				GenerateBackground();
+			}
 		}
 	}
 	
-	public void setDirection(GameDirection direction) {
+	void GenerateBackground() {
 		
-		currentDirection = direction;
+		GameObject obj;
+		Material mat;
+		
+		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		obj.transform.localScale = new Vector3(48, 27, 0.001f);
+		obj.transform.localPosition = new Vector3(0, currentBGHeight, 1);
+		obj.transform.Rotate(0, 180, 0);
+		
+		if (currentDirection == GameDirection.DivingDown) {
+
+			mat	= Resources.Load("Materials/sea", typeof(Material)) as Material;
+			obj.renderer.material = mat;
+			currentBGHeight -= Mathf.Abs(initialBGHeight);
+		}
+		else if (currentDirection == GameDirection.FlyingUp) {
+			
+			mat	= Resources.Load("Materials/sky", typeof(Material)) as Material;
+			obj.renderer.material = mat;
+			currentBGHeight += Mathf.Abs(initialBGHeight);
+		}
 	}
 	
-	public void applyWeapon(int objID, float top, WeaponType weaponType) {
+	public void applyWeapon(int objID, Vector3 pos, WeaponType weaponType) {
 		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		gridArray[index].applyWeapon(objID, weaponType);
+		if (currentDirection == GameDirection.DivingDown) {
+			
+			int index = Mathf.CeilToInt((initialHeight - pos.y) / (gridMargin + gridHeight)) - 1;
+
+			if (weaponType == WeaponType.Gun) {
+				gridArraySea[index].applyWeapon(objID, pos, weaponType);
+			}
+			else if (weaponType == WeaponType.Spear) {
+				
+				int iStart = Mathf.CeilToInt((initialHeight - oPlayer.transform.localPosition.y ) / (gridMargin + gridHeight)) - 1;
+				
+				for (int i = iStart; i <= index + 5; i++) {
+					gridArraySea[i].applyWeapon(objID, pos, weaponType);
+				}				
+			}
+			else if (weaponType == WeaponType.Bomb) {
+				
+				if (Vector3.Distance(oPlayer.transform.localPosition, pos) < 5) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("killed by bomb");
+				}
+				
+				for (int i = index - 5; i <= index + 5; i++) {
+					if (i >= 0)
+						gridArraySea[i].applyWeapon(objID, pos, weaponType);
+				}
+			}
+		}
 	}
 		
 	public int whenCollide(int objID, float top, int type) {
-		
-		int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
-		return gridArray[index].whenCollide(objID, type);
+
+		if (currentDirection == GameDirection.DivingDown) {
+			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
+			return gridArraySea[index].whenCollide(objID, type);
+		}
+		return 0;
 	}
 	
 	public class GridCell {
@@ -133,11 +271,31 @@ public class Grid : MonoBehaviour {
 				oCreature.Update();
 		}
 		
-		public void applyWeapon(int objID, WeaponType weaponType) {
-		
-			if (hasCreature) {
+		public void applyWeapon(int objID, Vector3 pos, WeaponType weaponType) {
+			
+			switch (weaponType) {
 				
-				oCreature.attackedBy(weaponType);
+			case WeaponType.Gun:
+				if (hasCreature) {
+					oCreature.attackedBy(weaponType);
+				}
+				break;
+				
+			case WeaponType.Spear:
+				if (hasCreature) {
+					if (Mathf.Abs(oCreature.getPosition().x - pos.x) < 1) {
+						oCreature.attackedBy(weaponType);
+					}
+				}
+				break;
+				
+			case WeaponType.Bomb:
+				if (hasCreature) {
+					if (Vector3.Distance(oCreature.getPosition(), pos) < 10) {
+						oCreature.attackedBy(weaponType);
+					}
+				}
+				break;
 			}
 		}
 		
@@ -158,8 +316,7 @@ public class Grid : MonoBehaviour {
 		} 
 		
 		bool isGenerate(float top, float bottom) {
-			
-			return (Random.Range (0.0F, 1.0F) < 0.7);
+			return (Random.Range (0.0F, 1.0F) < 0.6);
 		}
 
 	}
@@ -194,11 +351,11 @@ public abstract class Base {
 		
 		iStatus = status;
 		
-		if (iStatus == ObjStatus.Invisiable){
+		if (iStatus == ObjStatus.Invisible){
 			obj.renderer.enabled = false;
 			obj.collider.enabled = false;
 		}
-		else {
+		else{
 			obj.renderer.enabled = true;
 			obj.renderer.enabled = true;	
 		}
@@ -209,6 +366,10 @@ public abstract class Base {
 		get {
 			return objID;
 		}
+	}
+	
+	public Vector3 getPosition() {
+		return obj.transform.localPosition;
 	}
 	
 	public void Update() {
@@ -229,7 +390,7 @@ public abstract class Base {
 	}
 	protected abstract int generateType(float top, float bottom, Config oDetails);
 	protected abstract void changeDirection(int newDirection);
-	public abstract void whenCollide();
+	public abstract int whenCollide();
 }
 
 public class TreasureBox: Base {
@@ -249,8 +410,9 @@ public class TreasureBox: Base {
 		return weaponContained;
 	}
 	
-	public override void whenCollide() {
-			base.setStatus(ObjStatus.Invisiable);
+	public override int whenCollide() {
+		base.setStatus(ObjStatus.Invisible);
+		return weaponContained;
 	}
 	
 	protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
@@ -268,8 +430,9 @@ public class OxygenCan: Base {
 		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 	}
 	
-	public override void whenCollide() {
-			base.setStatus(ObjStatus.Invisiable);
+	public override int whenCollide() {
+		base.setStatus(ObjStatus.Invisible);
+		return 0;
 	}
 	
 	protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
@@ -320,14 +483,16 @@ public class Creature : Base {
 		}
 		
 		if (iHealth <= 0)
-			base.setStatus(ObjStatus.Invisiable);
+			base.setStatus(ObjStatus.Invisible);
+			//base.setStatus(ObjStatus.Stop);
 	}
 	
-	public override void whenCollide() {
+	public override int whenCollide() {
 		if (iStatus == ObjStatus.Normal) {
 			//Application.LoadLevel("GameOver");
 			Debug.Log("die");
 		}
+		return 0;
 	}
 	
 	protected override void changeDirection(int newDirection) {
@@ -339,11 +504,55 @@ public class Creature : Base {
 		else
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
 		
+		oCDetails.getTypes(iType).ToString();
+		
 		obj.renderer.material = mat;
 	}
 		
 	protected override int generateType(float top, float bottom, Config details) {
-		int index = Random.Range(0, details.getCount() - 1);
+		
+		int index = 0;
+		
+		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
+		int category = 0, firstDepth = -125, secondDepth = -250; 
+		
+		float randNum = Random.Range(0.0f, 1.0f);
+		
+		if(top > firstDepth){
+			small = 0.8f;
+			medium = 0.98f;
+			large = 1.0f;	
+		}
+		else if ((top < firstDepth) && (top > secondDepth)){
+			small = 0.4f;
+			medium = 0.9f;
+			large = 1.0f;
+		}
+		else{
+			small = 0.1f;
+			medium = 0.4f;
+			large = 1.0f;
+		}
+			
+		
+		if(randNum < small)
+				category = 0;
+		else if ((randNum>small) && (randNum<medium))
+			category = 1;
+		else
+			category = 2;
+		
+		switch(category){
+			case 0: 
+				index =Random.Range(0, 2);
+				break;
+			case 1:
+				index = Random.Range(2,4);
+				break;
+			case 2:
+				index = Random.Range(4,7);
+				break;
+		}
 		return index;
 	}
 	

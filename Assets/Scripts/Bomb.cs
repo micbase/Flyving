@@ -39,7 +39,7 @@ public class Bomb : MonoBehaviour {
 		if (collider.gameObject.tag == "Creature") {
 			
 			Grid screenGrid = oCamera.GetComponent("Grid") as Grid;
-			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, WeaponType.Bomb);
+			screenGrid.applyWeapon(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition, WeaponType.Bomb);
 			Destroy(this.gameObject);
 			Instantiate(Explosion1, exp_pos_1, Quaternion.identity);
 			Instantiate(Explosion2, exp_pos_1, Quaternion.identity);

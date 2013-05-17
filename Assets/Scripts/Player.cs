@@ -5,13 +5,13 @@ public class Player : MonoBehaviour {
 	
 	GameObject oPlayer;
 	GameObject oCamera;
-	GameObject oWater;
-	GameObject oBubble;
+	GameObject oBubble;	
+	
+	Grid grid;
 
 	public GameObject projectilePrefab;
 	public GameObject Bomb;
 	public GameObject Spear;
-	public int iHealth;
 	public WeaponType currentWeapon;
 	public int bomb_num = 0;
 	public int spear_num = 0;
@@ -19,21 +19,43 @@ public class Player : MonoBehaviour {
 	float colorspeed = 0.1f;
 	float Acolor = 0.0f;
 	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
-
+	
+	public int iLife;
+	public float iOxygen;
+	public float iFuel;
 
 	void Start () {
 		
-		iHealth = 100;
+		iLife = 3;
+		iOxygen = 30;
+		iFuel = 15;
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
 		oBubble = GameObject.Find("Bubbles");
-		oWater = GameObject.Find ("backPlane");
 		currentWeapon = WeaponType.noWeapon;
+		
+		grid = oCamera.GetComponent("Grid") as Grid;
+
 	}
 	
 	void Update () {
-				
+		
+		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
+		oBubble.transform.Translate(0, grid.gameSpeed, 0);
+		
+		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
+			iOxygen -= Time.deltaTime;
+			
+			if (iOxygen <= 0) {
+				Application.LoadLevel("GameOver");
+				Debug.Log("run out of oxygen");
+			}
+		}
+		
+		if (grid.CurrentDirection == GameDirection.FlyingUp)
+			iFuel -= Time.deltaTime;
+		
 		if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
 			oPlayer.transform.Translate(-0.5F, 0, 0);
 			oBubble.transform.Translate(-0.5F, 0, 0);
@@ -55,33 +77,42 @@ public class Player : MonoBehaviour {
 			oBubble.transform.Translate(0, -0.3F, 0);
 		}
 		
-		oCamera.transform.Translate(0, -0.1F, 0);
-		oPlayer.transform.Translate(0, -0.1F, 0);
-		oBubble.transform.Translate(0, -0.1F, 0);
-		oWater.transform.Translate(0,0, 0.1F);
-		
-		if (Acolor<=200.0f)
-		{	
-			Acolor = Acolor+colorspeed;
-			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
-			oWater.renderer.material.color = mycolor;
+		if (Input.GetKeyDown(KeyCode.Tab))
+		{
+			if (grid.CurrentDirection == GameDirection.DivingDown) {
+				grid.CurrentDirection = GameDirection.DivingUp;
+				//oPlayer.transform.Rotate(0,180.0f,0);
+			}
 		}
-
+		
+		if (grid.CurrentDirection == GameDirection.DivingUp && oPlayer.transform.localPosition.y >= 0) {
+			grid.CurrentDirection = GameDirection.FlyingUp;
+			oBubble.renderer.enabled = false;
+			Debug.Log("change to flying up");
+		}
+		
+		if (grid.CurrentDirection == GameDirection.FlyingUp && iFuel <= 0) {
+			grid.CurrentDirection = GameDirection.FlyingDown;
+			//open parachute
+			Debug.Log("change to flying down");
+		}
+		
+		if (grid.CurrentDirection == GameDirection.FlyingDown && oPlayer.transform.localPosition.y <= 0) {
+			grid.CurrentDirection = GameDirection.GameOver;
+			Debug.Log("return to surface");
+		}
+		
 		//using weapon
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			if (currentWeapon == WeaponType.Gun) {
 				Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
 			}
-		}
-		
-		if (Input.GetKeyDown(KeyCode.B)) {
+			
 			if (currentWeapon == WeaponType.Bomb && bomb_num>0) {
 				Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
 				bomb_num --;
 			}
-		}
-		
-		if (Input.GetKeyDown(KeyCode.V)) {
+
 			if (currentWeapon == WeaponType.Spear && spear_num>0) {
 				Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
 				spear_num --;
@@ -126,7 +157,7 @@ public class Player : MonoBehaviour {
 		if (collider.gameObject.tag == "OxygenCan") {
 				Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
 				screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
-				Dashboard.timeCount = 30.0f;
+				iOxygen = 30.0f;
 		}
 	}	
 	
