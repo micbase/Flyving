@@ -72,7 +72,7 @@ public class Player : MonoBehaviour {
 		{
 			if (grid.CurrentDirection == GameDirection.DivingDown) {
 				grid.CurrentDirection = GameDirection.DivingUp;
-				oPlayer.transform.Rotate(0,180.0f,0);
+				//oPlayer.transform.Rotate(0,180.0f,0);
 			}
 		}
 		

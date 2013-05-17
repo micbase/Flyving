@@ -18,7 +18,9 @@ public class Grid : MonoBehaviour {
 	float gridMargin;
 	float gridHeight;
 	float currentHeight;
+	float currentBGHeight;
 	float initialHeight = -15;
+	float initialBGHeight = -26.6f;
 	List<GridCell> gridArraySea;
 	List<GridCell> gridArraySky;
 
@@ -26,26 +28,20 @@ public class Grid : MonoBehaviour {
 	GameObject oCamera;
 	
 	GameObject oWater;
-	GameObject oBackWater1;
-	GameObject oBackWater2;
 	
 	Config[] objectDetails;
 	GameDirection currentDirection;
 		
 	float colorspeed = 0.1f;
 	float Acolor = 0.0f;
-	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
-	int n=2;
-	
+	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);	
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
 		
-		oWater = GameObject.Find ("backPlane");
-		oBackWater1 = GameObject.Find ("Water2");
-		oBackWater2 = GameObject.Find ("Water3");
+		//oWater = GameObject.Find ("backPlane");
 		
 		objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
@@ -55,6 +51,7 @@ public class Grid : MonoBehaviour {
 		gridHeight = 1;
 		
 		currentHeight = initialHeight;
+		currentBGHeight = initialBGHeight;
 		currentDirection = GameDirection.DivingDown;
 		
 		gridArraySea = new List<GridCell>();
@@ -71,61 +68,23 @@ public class Grid : MonoBehaviour {
 		
 		//Update camera and background
 		oCamera.transform.Translate(0, gameSpeed, 0);	
-		oWater.transform.Translate(0, 0, gameSpeed / 3);
+		//oWater.transform.Translate(0, 0, gameSpeed / 3);
 		
-		if(oWater.transform.localPosition.y>=-100)
-		{
-			oBackWater1.transform.localPosition=new Vector3(0,-50,2);
-			oBackWater2.transform.localPosition=new Vector3(0,-100,2);
-		}
-		if(gameSpeed<0)
-		{
-			if(oWater.transform.localPosition.y<-50*n)
-			{
-				if(n%2==1)
-				{
-					oBackWater2.transform.localPosition=new Vector3(0,-50*(n+1),2);
-					n++;
-				}
-				else
-				{
-					oBackWater1.transform.localPosition=new Vector3(0,-50*(n+1),2);
-					n++;
-				}
-				
-			}
-		}
-		else
-		{
-			if(oWater.transform.localPosition.y>-50*(n-1))
-			{
-				if(n%2==1)
-				{
-					oBackWater1.transform.localPosition=new Vector3(0,-50*(n-2),2);
-					n--;
-				}
-				else
-				{
-					oBackWater2.transform.localPosition=new Vector3(0,-50*(n-2),2);
-					n--;
-				}
-				
-			}
-		}
-		
+		/*
 		if (Acolor<=200.0f)
 		{	
 			Acolor = Acolor+colorspeed;
 			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
 			oWater.renderer.material.color = mycolor;
 		}
+		*/
 
 		//Update the creatures inside the grid.
 		if (currentDirection == GameDirection.DivingDown ||
 			currentDirection == GameDirection.DivingUp) {
 				
-			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
-			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
+			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
+			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
 			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
 			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
 			
@@ -144,8 +103,8 @@ public class Grid : MonoBehaviour {
 		else if (currentDirection == GameDirection.FlyingUp ||
 			currentDirection == GameDirection.FlyingDown) {
 			
-			startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 12;
-			endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 12;
+			startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
+			endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
 			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
 			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
 			
@@ -172,8 +131,10 @@ public class Grid : MonoBehaviour {
 		set {
 			currentDirection = value;
 			
-			if (value == GameDirection.FlyingUp)
+			if (value == GameDirection.FlyingUp) {
 				currentHeight = Mathf.Abs(initialHeight);
+				currentBGHeight = Mathf.Abs(initialBGHeight);
+			}
 			
 			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp)
 				gameSpeed = Mathf.Abs(gameSpeed);
@@ -191,12 +152,44 @@ public class Grid : MonoBehaviour {
 				gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
 				currentHeight -= gridMargin + gridHeight;
 			}
+			
+			while (currentBGHeight > currentHeight) {
+				GenerateBackground();
+			}
 		}
 		else if (currentDirection == GameDirection.FlyingUp) {
 			for (int i = 0; i < gridSize; i++) {
 				gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails));
 				currentHeight += gridMargin + gridHeight;
 			}
+			
+			while (currentBGHeight < currentHeight) {
+				GenerateBackground();
+			}
+		}
+	}
+	
+	void GenerateBackground() {
+		
+		GameObject obj;
+		Material mat;
+		
+		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		obj.transform.localScale = new Vector3(48, 27, 0.001f);
+		obj.transform.localPosition = new Vector3(0, currentBGHeight, 1);
+		obj.transform.Rotate(0, 180, 0);
+		
+		if (currentDirection == GameDirection.DivingDown) {
+
+			mat	= Resources.Load("Materials/sea", typeof(Material)) as Material;
+			obj.renderer.material = mat;
+			currentBGHeight -= Mathf.Abs(initialBGHeight);
+		}
+		else if (currentDirection == GameDirection.FlyingUp) {
+			
+			mat	= Resources.Load("Materials/sky", typeof(Material)) as Material;
+			obj.renderer.material = mat;
+			currentBGHeight += Mathf.Abs(initialBGHeight);
 		}
 	}
 	
