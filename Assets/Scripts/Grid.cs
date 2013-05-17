@@ -13,6 +13,7 @@ public enum WeaponType { Gun = 1, Bomb, Spear};
 public class Grid : MonoBehaviour {
 	
 	public float gameSpeed = -0.2f;
+	float baseSpeed = -0.2f;
 
 	int gridSize;
 	float gridMargin;
@@ -136,10 +137,11 @@ public class Grid : MonoBehaviour {
 				currentBGHeight = Mathf.Abs(initialBGHeight);
 			}
 			
-			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp)
-				gameSpeed = Mathf.Abs(gameSpeed);
+			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp) {
+				gameSpeed = Mathf.Abs(baseSpeed) * 3;
+			}
 			else if (value == GameDirection.FlyingDown || value == GameDirection.DivingDown)
-				gameSpeed = (-1) * Mathf.Abs(gameSpeed);
+				gameSpeed = (-1) * Mathf.Abs(baseSpeed);
 			else
 				gameSpeed = 0;
 		}
