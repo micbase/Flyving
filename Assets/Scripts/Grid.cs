@@ -328,7 +328,19 @@ public class Grid : MonoBehaviour {
 		} 
 		
 		bool isGenerate(float top, float bottom) {
-			return (Random.Range (0.0F, 1.0F) < 0.6);
+			
+			if (top > -150 || top < 150) {
+				return (Random.Range (0.0F, 1.0F) < 0.4F);
+			}
+			else if (top > -200 || top < 200) {
+				return (Random.Range (0.0F, 1.0F) < 0.6F);
+			}
+			else if (top > -300 || top < 300) {
+				return (Random.Range (0.0F, 1.0F) < 0.8F);
+			}
+			else {
+				return (Random.Range (0.0F, 1.0F) < 1.0F);
+			}
 		}
 
 	}
@@ -523,10 +535,10 @@ public class Creature : Base {
 		}
 		
 		if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
-			//if (iStatus == ObjStatus.Stop) {
+			if (iStatus == ObjStatus.Stop) {
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				base.setStatus(ObjStatus.Invisible);
-			//}
+			}
 		}
 		return 0;
 	}
