@@ -28,22 +28,20 @@ public class Grid : MonoBehaviour {
 
 	GameObject oPlayer;
 	GameObject oCamera;
-	
-	GameObject oWater;
+	GameObject oBlackPlane;
 	
 	Config[] objectDetails;
 	GameDirection currentDirection;
-		
-	float colorspeed = 0.1f;
-	float Acolor = 0.0f;
-	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);	
+	
+	Player player;
 	
 	void Start () {
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
+		oBlackPlane = GameObject.Find("BlackPlane");
 		
-		//oWater = GameObject.Find ("backPlane");
+		player = oPlayer.GetComponent("Player") as Player;
 		
 		objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
@@ -69,17 +67,20 @@ public class Grid : MonoBehaviour {
 		int iEnd = 0;
 		
 		//Update camera and background
-		oCamera.transform.Translate(0, gameSpeed, 0);	
-		//oWater.transform.Translate(0, 0, gameSpeed / 3);
+		oCamera.transform.Translate(0, gameSpeed, 0);
 		
-		/*
-		if (Acolor<=200.0f)
-		{	
-			Acolor = Acolor+colorspeed;
-			mycolor = new Color(15.0f/255,17.0f/255,29.0f/255,Acolor/255);
-			oWater.renderer.material.color = mycolor;
+		if (oCamera.transform.localPosition.y < 0) {
+			oBlackPlane.renderer.enabled = true;
+			oBlackPlane.transform.Translate(0, gameSpeed, 0);
 		}
-		*/
+		else {
+			oBlackPlane.renderer.enabled = false;
+		}
+		
+		if (oCamera.transform.localPosition.y > -500) {
+			
+			oBlackPlane.renderer.material.color = new Color(0, 0, 0, (float)(Mathf.Abs(oCamera.transform.localPosition.y) * 0.3) / 255);
+		}
 
 		//Update the creatures inside the grid.
 		if (currentDirection == GameDirection.DivingDown ||
@@ -139,7 +140,7 @@ public class Grid : MonoBehaviour {
 			}
 			
 			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp) {
-				gameSpeed = Mathf.Abs(baseSpeed) * 3;
+				gameSpeed = Mathf.Abs(baseSpeed) * 2;
 			}
 			else if (value == GameDirection.FlyingDown || value == GameDirection.DivingDown)
 				gameSpeed = (-1) * Mathf.Abs(baseSpeed);
@@ -216,8 +217,12 @@ public class Grid : MonoBehaviour {
 			else if (weaponType == WeaponType.Bomb) {
 				
 				if (Vector3.Distance(oPlayer.transform.localPosition, pos) < 5) {
-					Application.LoadLevel("GameOver");
-					Debug.Log("killed by bomb");
+					player.Life--;
+					
+					if (player.Life < 0) {
+						Application.LoadLevel("GameOver");
+						Debug.Log("killed by bomb");
+					}
 				}
 				
 				for (int i = index - 5; i <= index + 5; i++) {
@@ -426,9 +431,9 @@ public class OxygenCan: Base {
 	
 	public OxygenCan(float top, float bottom) : base(top, bottom) {
 		obj.tag = "OxygenCan";
-		iStatus = ObjStatus.Stop;		
+		iStatus = ObjStatus.Stop;
 		//Material mat = Resources.Load ("Materials/OxygenCan", typeof(Material)) as Material;
-		//obj.renderer.material = mat;		
+		//obj.renderer.material = mat;
 		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 	}
 	
@@ -445,6 +450,9 @@ public class Creature : Base {
 	
 	int iHealth;
 	Config oCDetails;
+	Dashboard dashBoard;
+	Grid grid;
+	Player player;
 	
 	public Creature(float top, float bottom, Config details) : base(top, bottom) {
 		
@@ -454,10 +462,13 @@ public class Creature : Base {
 		iType = generateType(top, bottom, oCDetails);
 		iHealth = oCDetails.getHealth(iType);
 		
+		dashBoard = GameObject.Find("Main Camera").GetComponent("Dashboard") as Dashboard;
+		grid = GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
+		player = GameObject.Find("Player").GetComponent("Player") as Player;
+		
 		Material mat;
 		if (iDirection == 1){
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
-			Debug.Log ("Current material:  " + mat.ToString());
 		}
 		else {
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
@@ -471,28 +482,43 @@ public class Creature : Base {
 	
 	public void attackedBy(WeaponType weaponType) {
 		
-		Dashboard dashBoard = GameObject.Find("Main Camera").GetComponent("Dashboard") as Dashboard;
-		dashBoard.iScore += oCDetails.getPoints(iType);
+		if (iStatus == ObjStatus.Normal) {
 			
-		if (weaponType == WeaponType.Gun) {
-			iHealth -= 5;
+			dashBoard.iScore += oCDetails.getPoints(iType);
+				
+			if (weaponType == WeaponType.Gun) {
+				iHealth -= 5;
+			}
+			else if (weaponType == WeaponType.Spear) {
+				iHealth -= 10;
+			}
+			else if (weaponType == WeaponType.Bomb) {
+				iHealth -= 100;
+			}
+			
+			if (iHealth <= 0) {
+				//base.setStatus(ObjStatus.Invisible);
+				base.setStatus(ObjStatus.Stop);
+				obj.transform.Rotate(0, 180, 0);
+			}
 		}
-		else if (weaponType == WeaponType.Spear) {
-			iHealth -= 10;
-		}
-		else if (weaponType == WeaponType.Bomb) {
-			iHealth -= 100;
-		}
-		
-		if (iHealth <= 0)
-			base.setStatus(ObjStatus.Invisible);
-			//base.setStatus(ObjStatus.Stop);
 	}
 	
 	public override int whenCollide() {
 		if (iStatus == ObjStatus.Normal) {
-			//Application.LoadLevel("GameOver");
-			Debug.Log("die");
+			player.Life--;
+			
+			if (player.Life < 0) {
+				Application.LoadLevel("GameOver");
+				Debug.Log("die");
+			}
+		}
+		
+		if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
+			if (iStatus == ObjStatus.Stop) {
+				dashBoard.iScore += oCDetails.getPoints(iType);
+				base.setStatus(ObjStatus.Invisible);
+			}
 		}
 		return 0;
 	}
@@ -505,9 +531,7 @@ public class Creature : Base {
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
 		else
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
-		
-		oCDetails.getTypes(iType).ToString();
-		
+				
 		obj.renderer.material = mat;
 	}
 		
@@ -538,7 +562,7 @@ public class Creature : Base {
 			
 		
 		if(randNum < small)
-				category = 0;
+			category = 0;
 		else if ((randNum>small) && (randNum<medium))
 			category = 1;
 		else

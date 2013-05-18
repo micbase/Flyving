@@ -12,6 +12,7 @@ public class Player : MonoBehaviour {
 	public GameObject projectilePrefab;
 	public GameObject Bomb;
 	public GameObject Spear;
+	
 	public WeaponType currentWeapon;
 	public int bomb_num = 0;
 	public int spear_num = 0;
@@ -20,7 +21,7 @@ public class Player : MonoBehaviour {
 	float Acolor = 0.0f;
 	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
 	
-	public int iLife;
+	int iLife;
 	public float iOxygen;
 	public float iFuel;
 
@@ -155,10 +156,23 @@ public class Player : MonoBehaviour {
 		}
 		
 		if (collider.gameObject.tag == "OxygenCan") {
-				Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
-				screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
-				iOxygen = 30.0f;
+			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
+			iOxygen = 30.0f;
 		}
-	}	
+	}
+	
+	public int Life {
+		get {
+			return iLife;
+		}
+		
+		set {
+			if (iLife > value) {
+				iLife--;
+				currentWeapon = WeaponType.noWeapon;
+			}
+		}
+	}
 	
 }
