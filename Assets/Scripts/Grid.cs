@@ -219,7 +219,7 @@ public class Grid : MonoBehaviour {
 				if (Vector3.Distance(oPlayer.transform.localPosition, pos) < 5) {
 					player.Life--;
 					
-					if (player.Life < 0) {
+					if (player.Life <= 0) {
 						Application.LoadLevel("GameOver");
 						Debug.Log("killed by bomb");
 					}
@@ -235,10 +235,15 @@ public class Grid : MonoBehaviour {
 		
 	public int whenCollide(int objID, float top, int type) {
 
-		if (currentDirection == GameDirection.DivingDown) {
+		if (currentDirection == GameDirection.DivingDown || currentDirection == GameDirection.DivingUp) {
 			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
 			return gridArraySea[index].whenCollide(objID, type);
 		}
+		else if (currentDirection == GameDirection.FlyingUp || currentDirection == GameDirection.FlyingDown) {
+			int index = Mathf.CeilToInt((initialHeight + top) / (gridMargin + gridHeight)) - 1;
+			return gridArraySky[index].whenCollide(objID, type);
+		}
+		
 		return 0;
 	}
 	
@@ -505,20 +510,23 @@ public class Creature : Base {
 	}
 	
 	public override int whenCollide() {
-		if (iStatus == ObjStatus.Normal) {
-			player.Life--;
+		if (grid.CurrentDirection == GameDirection.DivingDown) {
 			
-			if (player.Life < 0) {
-				Application.LoadLevel("GameOver");
-				Debug.Log("die");
+			if (iStatus == ObjStatus.Normal) {
+				player.Life--;
+				
+				if (player.Life <= 0) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("die");
+				}
 			}
 		}
 		
 		if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
-			if (iStatus == ObjStatus.Stop) {
+			//if (iStatus == ObjStatus.Stop) {
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				base.setStatus(ObjStatus.Invisible);
-			}
+			//}
 		}
 		return 0;
 	}

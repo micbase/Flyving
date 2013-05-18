@@ -8,7 +8,6 @@ public class Dashboard : MonoBehaviour {
 	GameObject oScore;
 	GameObject oOxygen;
 
-	
 	Player player;
 
 	private float height;
