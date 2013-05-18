@@ -556,8 +556,11 @@ public class Creature : Base {
 	}
 		
 	protected override int generateType(float top, float bottom, Config details) {
+		//After reading the config file, we use the selectedIndex 
 		
 		int index = 0;
+		int[] indCat = new int[details.getCategory().Length];
+		List<int> selectedIndex = new List<int>();
 		
 		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
 		int category = 0, firstDepth = -125, secondDepth = -250; 
@@ -579,7 +582,6 @@ public class Creature : Base {
 			medium = 0.4f;
 			large = 1.0f;
 		}
-			
 		
 		if(randNum < small)
 			category = 0;
@@ -588,17 +590,18 @@ public class Creature : Base {
 		else
 			category = 2;
 		
-		switch(category){
-			case 0: 
-				index =Random.Range(0, 2);
-				break;
-			case 1:
-				index = Random.Range(2,4);
-				break;
-			case 2:
-				index = Random.Range(4,7);
-				break;
+		indCat = details.getCategory();
+		
+		for(int i=0; i<indCat.Length; i++){
+			if(indCat[i] == category){
+				selectedIndex.Add(i);
+			}
 		}
+		
+		int rInd = Random.Range(0,selectedIndex.Count);
+		index = selectedIndex[rInd];
+		selectedIndex.Clear(); 
+		
 		return index;
 	}
 	
@@ -613,6 +616,7 @@ public class Config{
 	int[] health;
 	int[] points;
     int count;
+	int[] category;
 	
 	public  Config(string filepath){
 		int lineCount = 0;
@@ -629,11 +633,12 @@ public class Config{
 		speed = new float[2,lineCount];
 		health = new int[lineCount];
 		points = new int[lineCount];
+		category = new int[lineCount];
+		
         count = lineCount;
 		
 		TextReader tr = new StreamReader(filepath);
-		
-		for(int i=0; i<lineCount;i++){
+		for(int i=0; i<lineCount;i++){	
 			string[] s = tr.ReadLine().Split(',');
 			type[i] = s[0];
 			size[0,i] = float.Parse(s[1],CultureInfo.InvariantCulture.NumberFormat);
@@ -642,9 +647,10 @@ public class Config{
 			speed[1,i] = float.Parse(s[4],CultureInfo.InvariantCulture.NumberFormat);
 			health[i] = int.Parse(s[5],CultureInfo.InvariantCulture.NumberFormat);
 			points[i] = int.Parse(s[6], CultureInfo.InvariantCulture.NumberFormat);
+			category[i] = int.Parse(s[7], CultureInfo.InvariantCulture.NumberFormat);
 		}
 	}
-
+	
     public int getCount() {
         return count;
     }
@@ -673,5 +679,12 @@ public class Config{
 	
 	public int getPoints(int iType){
 		return points[iType];
+	} 
+	
+	public int[] getCategory(){
+		for(int i=0; i<category.Length;i++){
+			Debug.Log ("Categories GET: " + category[i]);
+		}
+		return category;
 	}
 }
