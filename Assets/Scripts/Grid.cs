@@ -524,7 +524,7 @@ public class Creature : Base {
 	public override int whenCollide() {
 		if (grid.CurrentDirection == GameDirection.DivingDown) {
 			
-			if (iStatus == ObjStatus.Normal) {
+			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
 				player.Life--;
 				
 				if (player.Life <= 0) {
@@ -535,7 +535,10 @@ public class Creature : Base {
 		}
 		
 		if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
-			if (iStatus == ObjStatus.Stop) {
+			
+			if ((oCDetails.getCategory(iType) == 0 && iStatus != ObjStatus.Invisible) 
+				|| iStatus == ObjStatus.Stop) {
+				
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				base.setStatus(ObjStatus.Invisible);
 			}
@@ -559,7 +562,7 @@ public class Creature : Base {
 		//After reading the config file, we use the selectedIndex 
 		
 		int index = 0;
-		int[] indCat = new int[details.getCategory().Length];
+		int[] indCat = new int[details.getCategorys().Length];
 		List<int> selectedIndex = new List<int>();
 		
 		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
@@ -590,7 +593,7 @@ public class Creature : Base {
 		else
 			category = 2;
 		
-		indCat = details.getCategory();
+		indCat = details.getCategorys();
 		
 		for(int i=0; i<indCat.Length; i++){
 			if(indCat[i] == category){
@@ -679,12 +682,16 @@ public class Config{
 	
 	public int getPoints(int iType){
 		return points[iType];
-	} 
+	}
 	
-	public int[] getCategory(){
-		for(int i=0; i<category.Length;i++){
-			Debug.Log ("Categories GET: " + category[i]);
-		}
+	public int getCategory(int iType) {
+		return category[iType];
+	}
+	
+	public int[] getCategorys(){
+		//for(int i=0; i<category.Length;i++){
+			//Debug.Log ("Categories GET: " + category[i]);
+		//}
 		return category;
 	}
 }

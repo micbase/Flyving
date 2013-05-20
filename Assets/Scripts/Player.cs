@@ -17,10 +17,6 @@ public class Player : MonoBehaviour {
 	public int bomb_num = 0;
 	public int spear_num = 0;
 	
-	float colorspeed = 0.1f;
-	float Acolor = 0.0f;
-	Color mycolor = new Color(15.0f,17.0f,29.0f,0.0f);
-	
 	int iLife;
 	public float iOxygen;
 	public float iFuel;
