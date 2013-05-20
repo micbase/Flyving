@@ -57,14 +57,27 @@ public class Player : MonoBehaviour {
 		if (grid.CurrentDirection == GameDirection.FlyingUp)
 			iFuel -= Time.deltaTime;
 		
-		if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
-			oPlayer.transform.Translate(-0.5F, 0, 0);
-			oBubble.transform.Translate(-0.5F, 0, 0);
+		if (grid.CurrentDirection == GameDirection.DivingDown ||grid.CurrentDirection == GameDirection.FlyingDown)
+		{
+			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+				oPlayer.transform.Translate(-0.5F, 0, 0);
+				oBubble.transform.Translate(-0.5F, 0, 0);
+			}
+			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+				oPlayer.transform.Translate(0.5F, 0, 0);
+				oBubble.transform.Translate(0.5F, 0, 0);
+			}
 		}
-		
-		else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
-			oPlayer.transform.Translate(0.5F, 0, 0);
-			oBubble.transform.Translate(0.5F, 0, 0);
+		else if (grid.CurrentDirection == GameDirection.DivingUp||grid.CurrentDirection == GameDirection.FlyingUp)
+		{
+			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+				oPlayer.transform.Translate(0.5F, 0, 0);
+				oBubble.transform.Translate(0.5F, 0, 0);
+				}
+			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+				oPlayer.transform.Translate(-0.5F, 0, 0);
+				oBubble.transform.Translate(-0.5F, 0, 0);
+			}			
 		}
 		
 		if (Input.GetKey(KeyCode.UpArrow) && (oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) < 7.5)
@@ -82,7 +95,7 @@ public class Player : MonoBehaviour {
 		{
 			if (grid.CurrentDirection == GameDirection.DivingDown) {
 				grid.CurrentDirection = GameDirection.DivingUp;
-				//oPlayer.transform.Rotate(0,180.0f,0);
+				oPlayer.transform.Rotate(0,180.0f,0);
 			}
 		}
 		
@@ -94,6 +107,7 @@ public class Player : MonoBehaviour {
 		
 		if (grid.CurrentDirection == GameDirection.FlyingUp && iFuel <= 0) {
 			grid.CurrentDirection = GameDirection.FlyingDown;
+			oPlayer.transform.Rotate(0,180.0f,0);
 			//open parachute
 			Debug.Log("change to flying down");
 		}
