@@ -449,9 +449,9 @@ public class OxygenCan: Base {
 	public OxygenCan(float top, float bottom) : base(top, bottom) {
 		obj.tag = "OxygenCan";
 		iStatus = ObjStatus.Stop;
-		//Material mat = Resources.Load ("Materials/OxygenCan", typeof(Material)) as Material;
-		//obj.renderer.material = mat;
-		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
+		Material mat = Resources.Load ("Materials/mOxygenCan", typeof(Material)) as Material;
+		obj.renderer.material = mat;
+		obj.transform.localScale = new Vector3(2.0f, 2.0f, 0.001F);
 	}
 	
 	public override int whenCollide() {
@@ -541,6 +541,14 @@ public class Creature : Base {
 				
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				base.setStatus(ObjStatus.Invisible);
+			}
+			else if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
+				player.Life--;
+				
+				if (player.Life <= 0) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("die");
+				}
 			}
 		}
 		return 0;
