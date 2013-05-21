@@ -522,7 +522,7 @@ public class Creature : Base {
 	}
 	
 	public override int whenCollide() {
-		if (grid.CurrentDirection == GameDirection.DivingDown) {
+		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
 			
 			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
 				player.Life--;

@@ -7,8 +7,10 @@ public class Dashboard : MonoBehaviour {
 	
 	GameObject oScore;
 	GameObject oOxygen;
+	GameObject[] oLife;
 
 	Player player;
+	int Max_Lives = 3;
 
 	private float height;
 	private float width;
@@ -23,6 +25,18 @@ public class Dashboard : MonoBehaviour {
 		
 		oScore = GameObject.Find("Score");
 		oOxygen = GameObject.Find("Oxygenbar");
+		oLife = new GameObject[Max_Lives];
+		
+		Texture2D texture = (Texture2D)Resources.Load("Textures/heart-icon");
+		for (int i = 0; i < Max_Lives; i++) {
+			
+			oLife[i] = new GameObject("Life");
+			oLife[i].AddComponent("GUITexture");
+			oLife[i].guiTexture.texture = texture;
+			oLife[i].gameObject.guiTexture.pixelInset = new Rect(0, 0, 32, 32);
+			oLife[i].transform.localPosition = new Vector3(0.02f + i * 0.05f, 0.87f, 1);
+			oLife[i].transform.localScale = new Vector3(0, 0, 1);
+		}
 		
 		player = GameObject.Find("Player").GetComponent("Player") as Player;
 		
@@ -47,6 +61,17 @@ public class Dashboard : MonoBehaviour {
 
 		
 		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, height*player.iOxygen*3.33F/100);
+	}
+	
+	public void updateLife(int life) {
+		
+		for (int i = 0; i < life; i++) {
+			oLife[i].guiTexture.enabled = true;
+		}
+		
+		for (int i = life; i < Max_Lives; i++) {
+			oLife[i].guiTexture.enabled = false;
+		}	
 	}
 	
 }

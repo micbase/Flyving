@@ -8,7 +8,8 @@ public class Player : MonoBehaviour {
 	GameObject oBubble;	
 	
 	Grid grid;
-
+	Dashboard dashboard;
+	
 	public GameObject projectilePrefab;
 	public GameObject Bomb;
 	public GameObject Spear;
@@ -20,7 +21,7 @@ public class Player : MonoBehaviour {
 	int iLife;
 	public float iOxygen;
 	public float iFuel;
-
+		
 	void Start () {
 		
 		iLife = 3;
@@ -33,13 +34,14 @@ public class Player : MonoBehaviour {
 		currentWeapon = WeaponType.noWeapon;
 		
 		grid = oCamera.GetComponent("Grid") as Grid;
-
+		dashboard = oCamera.GetComponent("Dashboard") as Dashboard;
 	}
 	
 	void Update () {
 		
 		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
 		oBubble.transform.Translate(0, grid.gameSpeed, 0);
+		
 		
 		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
 			iOxygen -= Time.deltaTime;
@@ -115,18 +117,21 @@ public class Player : MonoBehaviour {
 		
 		//using weapon
 		if (Input.GetKeyDown(KeyCode.Space)) {
-			if (currentWeapon == WeaponType.Gun) {
-				Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
-			}
 			
-			if (currentWeapon == WeaponType.Bomb && bomb_num>0) {
-				Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
-				bomb_num --;
-			}
-
-			if (currentWeapon == WeaponType.Spear && spear_num>0) {
-				Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
-				spear_num --;
+			if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
+				if (currentWeapon == WeaponType.Gun) {
+					Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
+				}
+				
+				if (currentWeapon == WeaponType.Bomb && bomb_num>0) {
+					Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
+					bomb_num --;
+				}
+	
+				if (currentWeapon == WeaponType.Spear && spear_num>0) {
+					Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
+					spear_num --;
+				}
 			}
 		}
 		
@@ -180,6 +185,7 @@ public class Player : MonoBehaviour {
 		set {
 			if (iLife > value) {
 				iLife--;
+				dashboard.updateLife(iLife);
 				currentWeapon = WeaponType.noWeapon;
 			}
 		}
