@@ -451,7 +451,8 @@ public class OxygenCan: Base {
 		iStatus = ObjStatus.Stop;
 		Material mat = Resources.Load ("Materials/mOxygenCan", typeof(Material)) as Material;
 		obj.renderer.material = mat;
-		obj.transform.localScale = new Vector3(2.0f, 2.0f, 0.001F);
+		
+		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 	}
 	
 	public override int whenCollide() {
