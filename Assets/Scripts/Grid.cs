@@ -46,6 +46,7 @@ public class Grid : MonoBehaviour {
 		
 		objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
+		objectDetails[1] = new Config("Assets/Resources/allbird.txt");
 		
 		gridSize = 20;
 		gridMargin = 1;
@@ -154,7 +155,7 @@ public class Grid : MonoBehaviour {
 		
 		if (currentDirection == GameDirection.DivingDown) {
 			for (int i = 0; i < gridSize; i++) {
-				gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails));
+				gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails[0]));
 				currentHeight -= gridMargin + gridHeight;
 			}
 			
@@ -164,7 +165,7 @@ public class Grid : MonoBehaviour {
 		}
 		else if (currentDirection == GameDirection.FlyingUp) {
 			for (int i = 0; i < gridSize; i++) {
-				gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails));
+				gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails[1]));
 				currentHeight += gridMargin + gridHeight;
 			}
 			
@@ -261,13 +262,13 @@ public class Grid : MonoBehaviour {
 		OxygenCan oOxygen = null;
 
 		
-		public GridCell(float top, float bottom, Config[] objectDetail) {
+		public GridCell(float top, float bottom, Config objectDetail) {
 			topPosition = top;
 			bottomPosition = bottom;
 			
 			hasCreature = isGenerateCreature(topPosition, bottomPosition);
 			if (hasCreature)
-				oCreature = new Creature(topPosition, bottomPosition, objectDetail[0]);
+				oCreature = new Creature(topPosition, bottomPosition, objectDetail);
 			
 			hasTreasure = isGenerateTreasure(topPosition, bottomPosition);
 			if (hasTreasure) 
