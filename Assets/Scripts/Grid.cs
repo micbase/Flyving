@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
+using System.Timers;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
 public enum CreatureType { Dolphin = 1 };
@@ -234,7 +235,8 @@ public class Grid : MonoBehaviour {
 	}
 		
 	public int whenCollide(int objID, float top, int type) {
-
+		StartCoroutine(FlashWhenHit());
+		
 		if (currentDirection == GameDirection.DivingDown || currentDirection == GameDirection.DivingUp) {
 			int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
 			return gridArraySea[index].whenCollide(objID, type);
@@ -343,6 +345,29 @@ public class Grid : MonoBehaviour {
 			}
 		}
 
+	}
+	
+	public IEnumerator Fade (float start, float end, float length, GameObject currentObject) { //define Fade parmeters
+    	if (currentObject.guiTexture.color.a == start){
+        	for (float i = 0.0f; i < 1.0f; i += Time.deltaTime*(1/length)) { //for the length of time
+				
+				Color temp; // temporary variable
+  				temp = currentObject.guiTexture.color;
+				temp.a = Mathf.Lerp(start, end, i); // start appearing when health < 100%
+				yield return true;
+				temp.a = end;
+				currentObject.guiTexture.color = temp;
+  
+	        } //end for 
+	    } //end if
+	 
+	} //end Fade
+ 
+	public IEnumerator FlashWhenHit(){
+		GameObject oTexture = GameObject.Find("Oxygenbar");
+	    Fade (0, 0.8f, 0.5f, oTexture);
+	    yield return new WaitForSeconds (.01f);
+	    Fade (0.8f, 0, 0.5f, oTexture);
 	}
 }
 
@@ -470,9 +495,8 @@ public class Creature : Base {
 	Dashboard dashBoard;
 	Grid grid;
 	Player player;
-	
+
 	public Creature(float top, float bottom, Config details) : base(top, bottom) {
-		
 		obj.tag = "Creature";
 		oCDetails = details;
 		iStatus = ObjStatus.Normal;
@@ -516,20 +540,23 @@ public class Creature : Base {
 			if (iHealth <= 0) {
 				//base.setStatus(ObjStatus.Invisible);
 				base.setStatus(ObjStatus.Stop);
-				obj.transform.Rotate(0, 180, 0);
+				obj.transform.Rotate(0, 180, 0);	
 			}
 		}
 	}
 	
 	public override int whenCollide() {
+		
 		if (grid.CurrentDirection == GameDirection.DivingDown) {
 			
 			if (iStatus == ObjStatus.Normal) {
-				player.Life--;
-				
+				if(!player.Blink)
+					player.Life--;
+								
 				if (player.Life <= 0) {
-					Application.LoadLevel("GameOver");
+					//Application.LoadLevel("GameOver");
 					Debug.Log("die");
+					
 				}
 			}
 		}
@@ -542,7 +569,7 @@ public class Creature : Base {
 		}
 		return 0;
 	}
-	
+	//public Player 
 	protected override void changeDirection(int newDirection) {
 		iDirection = newDirection;
 		
@@ -550,8 +577,8 @@ public class Creature : Base {
 		if (iDirection == 1)
 			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Left", typeof(Material)) as Material;
 		else
-			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;
-				
+			mat	= Resources.Load("Materials/m" + oCDetails.getTypes(iType) + "Right", typeof(Material)) as Material;		
+		
 		obj.renderer.material = mat;
 	}
 		
@@ -605,8 +632,8 @@ public class Creature : Base {
 		return index;
 	}
 	
-}
 
+}
 
 public class Config{
 	//type,size(width,height),speed(low,high),health,points
@@ -682,9 +709,6 @@ public class Config{
 	} 
 	
 	public int[] getCategory(){
-		for(int i=0; i<category.Length;i++){
-			Debug.Log ("Categories GET: " + category[i]);
-		}
 		return category;
 	}
 }

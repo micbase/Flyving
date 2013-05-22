@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System.Timers;
 
 public class Player : MonoBehaviour {
 	
 	GameObject oPlayer;
 	GameObject oCamera;
 	GameObject oBubble;	
+	Color thecolor;
 	
 	Grid grid;
 
@@ -24,6 +26,9 @@ public class Player : MonoBehaviour {
 	int iLife;
 	public float iOxygen;
 	public float iFuel;
+	
+	
+	bool blink = false;
 
 	void Start () {
 		
@@ -37,11 +42,10 @@ public class Player : MonoBehaviour {
 		currentWeapon = WeaponType.noWeapon;
 		
 		grid = oCamera.GetComponent("Grid") as Grid;
-
 	}
 	
+	
 	void Update () {
-		
 		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
 		oBubble.transform.Translate(0, grid.gameSpeed, 0);
 		
@@ -125,6 +129,7 @@ public class Player : MonoBehaviour {
 			w.transform.Translate(0, -0.2F, 0);
 		}
 		
+		
 	}
 
 	void OnTriggerEnter(Collider collider) {
@@ -170,7 +175,22 @@ public class Player : MonoBehaviour {
 		set {
 			if (iLife > value) {
 				iLife--;
+				Blink = true;
 				currentWeapon = WeaponType.noWeapon;
+			}
+		}
+	}
+	
+	public bool Blink {
+		get{
+			return blink;
+		}
+		set{
+			Debug.Log ("Setting blink");
+			blink = value;
+			if(blink){
+					animation.Play();	
+					blink = false;
 			}
 		}
 	}

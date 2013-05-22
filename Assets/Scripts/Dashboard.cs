@@ -7,6 +7,7 @@ public class Dashboard : MonoBehaviour {
 	
 	GameObject oScore;
 	GameObject oOxygen;
+	GameObject oFlash;
 
 	Player player;
 
@@ -23,6 +24,8 @@ public class Dashboard : MonoBehaviour {
 		
 		oScore = GameObject.Find("Score");
 		oOxygen = GameObject.Find("Oxygenbar");
+		oFlash = GameObject.Find("flash");
+		
 		
 		player = GameObject.Find("Player").GetComponent("Player") as Player;
 		
