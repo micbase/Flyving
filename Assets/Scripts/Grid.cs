@@ -265,15 +265,15 @@ public class Grid : MonoBehaviour {
 			topPosition = top;
 			bottomPosition = bottom;
 			
-			hasCreature = isGenerate(topPosition, bottomPosition);
+			hasCreature = isGenerateCreature(topPosition, bottomPosition);
 			if (hasCreature)
 				oCreature = new Creature(topPosition, bottomPosition, objectDetail[0]);
 			
-			hasTreasure = (Random.Range (0.0f,1.0f) < 0.04f);
+			hasTreasure = isGenerateTreasure(topPosition, bottomPosition);
 			if (hasTreasure) 
 				oTreasure = new TreasureBox(topPosition, bottomPosition);
 			
-			hasOxygen = (Random.Range (0.0f,1.0f) < 0.06f);
+			hasOxygen = isGenerateOxygen(topPosition, bottomPosition);
 			if (hasOxygen) {
 				oOxygen = new OxygenCan(topPosition, bottomPosition);
 			}
@@ -329,7 +329,7 @@ public class Grid : MonoBehaviour {
 			}
 		} 
 		
-		bool isGenerate(float top, float bottom) {
+		bool isGenerateCreature(float top, float bottom) {
 			
 			if (top > -150 || top < 150) {
 				return (Random.Range (0.0F, 1.0F) < 0.4F);
@@ -344,7 +344,26 @@ public class Grid : MonoBehaviour {
 				return (Random.Range (0.0F, 1.0F) < 1.0F);
 			}
 		}
-
+		
+		bool isGenerateTreasure(float top, float bottom) {
+			
+			if (top < 0) {
+				return (Random.Range (0.0f,1.0f) < 0.04f);
+			}
+			else {
+				return false;
+			}
+		}
+		
+		bool isGenerateOxygen(float top, float bottom) {
+			
+			if (top < 0) {
+				return (Random.Range (0.0f,1.0f) < 0.03f);
+			}
+			else {
+				return false;
+			}
+		}
 	}
 	
 	public IEnumerator Fade (float start, float end, float length, GameObject currentObject) { //define Fade parmeters
