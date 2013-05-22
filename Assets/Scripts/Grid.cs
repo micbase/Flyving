@@ -474,8 +474,9 @@ public class OxygenCan: Base {
 	public OxygenCan(float top, float bottom) : base(top, bottom) {
 		obj.tag = "OxygenCan";
 		iStatus = ObjStatus.Stop;
-		//Material mat = Resources.Load ("Materials/OxygenCan", typeof(Material)) as Material;
-		//obj.renderer.material = mat;
+		Material mat = Resources.Load ("Materials/mOxygenCan", typeof(Material)) as Material;
+		obj.renderer.material = mat;
+		
 		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 	}
 	
@@ -546,13 +547,12 @@ public class Creature : Base {
 	}
 	
 	public override int whenCollide() {
-		
-		if (grid.CurrentDirection == GameDirection.DivingDown) {
+								
+		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
 			
-			if (iStatus == ObjStatus.Normal) {
+			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
 				if(!player.Blink)
 					player.Life--;
-								
 				if (player.Life <= 0) {
 					//Application.LoadLevel("GameOver");
 					Debug.Log("die");
@@ -562,9 +562,20 @@ public class Creature : Base {
 		}
 		
 		if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
-			if (iStatus == ObjStatus.Stop) {
+			
+			if ((oCDetails.getCategory(iType) == 0 && iStatus != ObjStatus.Invisible) 
+				|| iStatus == ObjStatus.Stop) {
+				
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				base.setStatus(ObjStatus.Invisible);
+			}
+			else if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
+				player.Life--;
+				
+				if (player.Life <= 0) {
+					Application.LoadLevel("GameOver");
+					Debug.Log("die");
+				}
 			}
 		}
 		return 0;
@@ -586,7 +597,7 @@ public class Creature : Base {
 		//After reading the config file, we use the selectedIndex 
 		
 		int index = 0;
-		int[] indCat = new int[details.getCategory().Length];
+		int[] indCat = new int[details.getCategorys().Length];
 		List<int> selectedIndex = new List<int>();
 		
 		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
@@ -617,7 +628,7 @@ public class Creature : Base {
 		else
 			category = 2;
 		
-		indCat = details.getCategory();
+		indCat = details.getCategorys();
 		
 		for(int i=0; i<indCat.Length; i++){
 			if(indCat[i] == category){
@@ -706,9 +717,14 @@ public class Config{
 	
 	public int getPoints(int iType){
 		return points[iType];
-	} 
+	}
 	
-	public int[] getCategory(){
+
+	public int getCategory(int iType) {
+		return category[iType];
+	}
+	
+	public int[] getCategorys(){
 		return category;
 	}
 }
