@@ -553,8 +553,9 @@ public class Creature : Base {
 			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
 				if(!player.Blink)
 					player.Life--;
+				
 				if (player.Life <= 0) {
-					//Application.LoadLevel("GameOver");
+					Application.LoadLevel("GameOver");
 					Debug.Log("die");
 					
 				}

@@ -25,6 +25,7 @@ public class Player : MonoBehaviour {
 	public float iFuel;
 	
 	bool blink = false;
+	float timeCount = 3.0f;
 
 	void Start () {
 		
@@ -146,7 +147,12 @@ public class Player : MonoBehaviour {
 			w.transform.Translate(0, -0.2F, 0);
 		}
 		
-		
+		if (Blink) {
+			timeCount -= Time.deltaTime;
+			
+			if (timeCount <= 0)
+				Blink = false;
+		}
 	}
 
 	void OnTriggerEnter(Collider collider) {
@@ -207,8 +213,8 @@ public class Player : MonoBehaviour {
 			blink = value;
 			if(blink){
 				if(!animation.isPlaying){
-					animation.Play();	
-					blink = false;
+					timeCount = 3.0f;
+					animation.Play();
 				}
 			}
 		}
