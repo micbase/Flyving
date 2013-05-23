@@ -18,7 +18,6 @@ public class Dashboard : MonoBehaviour {
 	private float width;
 	private float x;
 	private float y;
-	private float delta;
 	private float currentx;
 	private float currenty;
 	private float currentz;
@@ -63,13 +62,12 @@ public class Dashboard : MonoBehaviour {
 	void Update () {
 		
 		oScore.guiText.text = "Score: " + iScore.ToString("0");
-		delta=Time.deltaTime*height*3.33F/100;
 		currentx=oOxygen.transform.localPosition.x;
 		currenty=oOxygen.transform.localPosition.y+0.000035f;
 		currentz=oOxygen.transform.localPosition.z;
 		oOxygen.transform.localPosition=new Vector3(currentx,currenty,currentz);
 
-		currentheight=height*player.iOxygen*3.33F/100;
+		currentheight=height*player.fOxygen*3.33F/100;
 		oOxygen.guiTexture.pixelInset = new Rect(x,y,width, currentheight);
 		if ((currentheight/height)<=0.7f)
 		{

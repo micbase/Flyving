@@ -17,73 +17,89 @@ public class Player : MonoBehaviour {
 	public GameObject Spear;
 	
 	public WeaponType currentWeapon;
-	public int bomb_num = 0;
-	public int spear_num = 0;
+	public PlayerEffect currentEffect;
+	public float weaponCount = 0;
+	public float effectCount = 0;
 	
 	int iLife;
-	public float iOxygen;
-	public float iFuel;
+	public float fOxygen;
+	public float fFuel;
 	
 	bool blink = false;
-	float timeCount = 3.0f;
+	float blinkTimeCount = 0;
 
 	void Start () {
 		
 		iLife = 3;
-		iOxygen = 30;
-		iFuel = 15;
+		fOxygen = 30;
+		fFuel = 15;
 		
 		oPlayer = GameObject.Find("Player");
 		oCamera = GameObject.Find("Main Camera");
 		oBubble = GameObject.Find("Bubbles");
 		currentWeapon = WeaponType.noWeapon;
+		currentEffect = PlayerEffect.noEffect;
 		
 		grid = oCamera.GetComponent("Grid") as Grid;
-
 		dashboard = oCamera.GetComponent("Dashboard") as Dashboard;
 
 	}
 	
-	
 	void Update () {
-		oPlayer.transform.Translate(0, grid.gameSpeed, 0);
-		oBubble.transform.Translate(0, grid.gameSpeed, 0);
 		
+		oPlayer.transform.Translate(0, grid.GameSpeed, 0);
+		oBubble.transform.Translate(0, grid.GameSpeed, 0);
+		
+		//apply player effect
+		if (currentEffect != PlayerEffect.noEffect) {
+			
+			effectCount -= Time.deltaTime;
+		}
+		
+		if (effectCount <= 0) {
+			
+			if (currentEffect == PlayerEffect.SlowDown || currentEffect == PlayerEffect.SpeedUp) {
+				
+				grid.speedFactor = 1;
+			}
+			
+			currentEffect = PlayerEffect.noEffect;			
+		}
 		
 		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
-			iOxygen -= Time.deltaTime;
 			
-			if (iOxygen <= 0) {
+			fOxygen -= Time.deltaTime;
+			
+			if (fOxygen <= 0) {
 				Application.LoadLevel("GameOver");
 				Debug.Log("run out of oxygen");
 			}
 		}
 		
 		if (grid.CurrentDirection == GameDirection.FlyingUp)
-			iFuel -= Time.deltaTime;
+			fFuel -= Time.deltaTime;
 		
-		if (grid.CurrentDirection == GameDirection.DivingDown ||grid.CurrentDirection == GameDirection.FlyingDown)
-		{
-			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
-				oPlayer.transform.Translate(-0.5F, 0, 0);
-				oBubble.transform.Translate(-0.5F, 0, 0);
-			}
-			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
-				oPlayer.transform.Translate(0.5F, 0, 0);
-				oBubble.transform.Translate(0.5F, 0, 0);
-			}
-		}
-		else if (grid.CurrentDirection == GameDirection.DivingUp||grid.CurrentDirection == GameDirection.FlyingUp)
-		{
-			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+		if (currentEffect == PlayerEffect.Inverse) {
+			
+			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x < 17) {
 				oPlayer.transform.Translate(0.5F, 0, 0);
 				oBubble.transform.Translate(0.5F, 0, 0);
 				}
-			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x > -17) {
 				oPlayer.transform.Translate(-0.5F, 0, 0);
 				oBubble.transform.Translate(-0.5F, 0, 0);
 			}			
 		}
+		else {
+			if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+				oPlayer.transform.Translate(-0.5F, 0, 0);
+				oBubble.transform.Translate(-0.5F, 0, 0);
+			}
+			else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+				oPlayer.transform.Translate(0.5F, 0, 0);
+				oBubble.transform.Translate(0.5F, 0, 0);
+			}
+		}	
 		
 		if (Input.GetKey(KeyCode.UpArrow) && (oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) < 7.5)
 		{
@@ -100,7 +116,7 @@ public class Player : MonoBehaviour {
 		{
 			if (grid.CurrentDirection == GameDirection.DivingDown) {
 				grid.CurrentDirection = GameDirection.DivingUp;
-				oPlayer.transform.Rotate(0,180.0f,0);
+				//oPlayer.transform.Rotate(0,180.0f,0);
 			}
 		}
 		
@@ -110,9 +126,9 @@ public class Player : MonoBehaviour {
 			Debug.Log("change to flying up");
 		}
 		
-		if (grid.CurrentDirection == GameDirection.FlyingUp && iFuel <= 0) {
+		if (grid.CurrentDirection == GameDirection.FlyingUp && fFuel <= 0) {
 			grid.CurrentDirection = GameDirection.FlyingDown;
-			oPlayer.transform.Rotate(0,180.0f,0);
+			//oPlayer.transform.Rotate(0,180.0f,0);
 			//open parachute
 			Debug.Log("change to flying down");
 		}
@@ -123,21 +139,31 @@ public class Player : MonoBehaviour {
 		}
 		
 		//using weapon
+		if (currentWeapon == WeaponType.Gun) {
+			
+			weaponCount -= Time.deltaTime;
+		}
+		
+		if (currentWeapon != WeaponType.noWeapon && weaponCount <= 0) {
+			
+			currentWeapon = WeaponType.noWeapon;
+		}
+		
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			
 			if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
-				if (currentWeapon == WeaponType.Gun) {
+				if (currentWeapon == WeaponType.Gun && weaponCount > 0) {
 					Instantiate(projectilePrefab, oPlayer.transform.localPosition, Quaternion.identity);
 				}
 				
-				if (currentWeapon == WeaponType.Bomb && bomb_num>0) {
+				if (currentWeapon == WeaponType.Bomb && weaponCount > 0) {
 					Instantiate(Bomb, oPlayer.transform.localPosition, Quaternion.identity);
-					bomb_num --;
+					weaponCount--;
 				}
 	
-				if (currentWeapon == WeaponType.Spear && spear_num>0) {
+				if (currentWeapon == WeaponType.Spear && weaponCount > 0) {
 					Instantiate(Spear, oPlayer.transform.localPosition, Quaternion.identity);
-					spear_num --;
+					weaponCount--;
 				}
 			}
 		}
@@ -148,9 +174,9 @@ public class Player : MonoBehaviour {
 		}
 		
 		if (Blink) {
-			timeCount -= Time.deltaTime;
+			blinkTimeCount -= Time.deltaTime;
 			
-			if (timeCount <= 0)
+			if (blinkTimeCount <= 0)
 				Blink = false;
 		}
 	}
@@ -160,33 +186,63 @@ public class Player : MonoBehaviour {
 		if (collider.gameObject.tag == "Creature") {
 			
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
-			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 1);
+			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Creature);
 		}
 		if (collider.gameObject.tag == "TreasureBox") {
+			
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
-			int weapon = screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 0);
-			switch (weapon) {
-			case 1:
+			TreasureType type = (TreasureType)screenGrid.whenCollide(int.Parse(collider.gameObject.name), 
+				collider.gameObject.transform.localPosition.y, CellType.Treasure);
+			
+			switch (type) {
+				
+			case TreasureType.Gun:
 				currentWeapon = WeaponType.Gun;
+				weaponCount = 10;
 				break;
-			case 2:
+				
+			case TreasureType.Bomb:
 				currentWeapon = WeaponType.Bomb;
-				bomb_num = 3;
+				weaponCount = 3;
 				break;
-			case 3:
+				
+			case TreasureType.Spear:
 				currentWeapon = WeaponType.Spear;
-				spear_num = 5;
+				weaponCount = 5;
 				break;
-			default:
-				currentWeapon = WeaponType.noWeapon;
+				
+			case TreasureType.Inverse:
+				currentEffect = PlayerEffect.Inverse;
+				effectCount = 10;
+				break;
+				
+			case TreasureType.Undefeat:
+				currentEffect = PlayerEffect.Undefeat;
+				effectCount = 10;
+				break;
+				
+			case TreasureType.SlowDown:
+				currentEffect = PlayerEffect.SlowDown;
+				grid.speedFactor = 0.5f;
+				effectCount = 10;
+				break;
+				
+			case TreasureType.SpeedUp:
+				currentEffect = PlayerEffect.SpeedUp;
+				grid.speedFactor = 2;
+				effectCount = 10;
 				break;
 			}
 		}
 		
 		if (collider.gameObject.tag == "OxygenCan") {
+			
 			Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
-			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, 2);
-			iOxygen = 30.0f;
+			screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Oxygen);
+			
+			fOxygen += 10.0f;
+			if (fOxygen > 30)
+				fOxygen = 30;
 		}
 	}
 	
@@ -197,10 +253,16 @@ public class Player : MonoBehaviour {
 		
 		set {
 			if (iLife > value) {
-				iLife--;
-				Blink = true;
-				dashboard.updateLife(iLife);
-				currentWeapon = WeaponType.noWeapon;
+				
+				if (!Blink && currentEffect != PlayerEffect.Undefeat) {
+					
+					iLife--;
+					Blink = true;
+					dashboard.updateLife(iLife);
+					currentWeapon = WeaponType.noWeapon;
+					currentEffect = PlayerEffect.noEffect;
+					grid.speedFactor = 1;
+				}
 			}
 		}
 	}
@@ -213,7 +275,7 @@ public class Player : MonoBehaviour {
 			blink = value;
 			if(blink){
 				if(!animation.isPlaying){
-					timeCount = 3.0f;
+					blinkTimeCount = 3.0f;
 					animation.Play();
 				}
 			}

@@ -6,15 +6,16 @@ using System.Globalization;
 using System.Timers;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
-public enum CreatureType { Dolphin = 1 };
-public enum TreasureType { Gun = 1 };
-
+public enum TreasureType { Gun = 1, Spear, Bomb, Inverse, Undefeat, SlowDown, SpeedUp };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
-public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon};
+public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
+public enum CellType { Creature = 1, Treasure, Oxygen };
+public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, noEffect };
 
 public class Grid : MonoBehaviour {
 	
-	public float gameSpeed = -0.2f;
+	public float speedFactor = 1;
+	float gameSpeed = -0.2f;
 	float baseSpeed = -0.2f;
 
 	int gridSize;
@@ -67,13 +68,13 @@ public class Grid : MonoBehaviour {
 		float endPoint;
 		int iStart = 0;
 		int iEnd = 0;
-		
+						
 		//Update camera and background
-		oCamera.transform.Translate(0, gameSpeed, 0);
+		oCamera.transform.Translate(0, GameSpeed, 0);
 		
 		if (oCamera.transform.localPosition.y < 0) {
 			oBlackPlane.renderer.enabled = true;
-			oBlackPlane.transform.Translate(0, gameSpeed, 0);
+			oBlackPlane.transform.Translate(0, GameSpeed, 0);
 		}
 		else {
 			oBlackPlane.renderer.enabled = false;
@@ -142,12 +143,22 @@ public class Grid : MonoBehaviour {
 			}
 			
 			if (value == GameDirection.DivingUp || value == GameDirection.FlyingUp) {
-				gameSpeed = Mathf.Abs(baseSpeed) * 2;
+				GameSpeed = Mathf.Abs(baseSpeed) * 2;
 			}
 			else if (value == GameDirection.FlyingDown || value == GameDirection.DivingDown)
-				gameSpeed = (-1) * Mathf.Abs(baseSpeed);
+				GameSpeed = (-1) * Mathf.Abs(baseSpeed);
 			else
-				gameSpeed = 0;
+				GameSpeed = 0;
+		}
+	}
+	
+	public float GameSpeed {
+		get {
+			return gameSpeed * speedFactor;
+		}
+		
+		set {
+			gameSpeed = value;
 		}
 	}
 	
@@ -235,7 +246,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 		
-	public int whenCollide(int objID, float top, int type) {
+	public int whenCollide(int objID, float top, CellType type) {
 		StartCoroutine(FlashWhenHit());
 		
 		if (currentDirection == GameDirection.DivingDown || currentDirection == GameDirection.DivingUp) {
@@ -254,9 +265,11 @@ public class Grid : MonoBehaviour {
 		
 		float topPosition;
 		float bottomPosition;
+		
 		bool hasCreature = false;
 		bool hasTreasure = false;
 		bool hasOxygen = false;
+		
 		Creature oCreature = null;
 		TreasureBox oTreasure = null;
 		OxygenCan oOxygen = null;
@@ -314,20 +327,30 @@ public class Grid : MonoBehaviour {
 			}
 		}
 		
-		public int whenCollide(int objID, int type) {
-			if (type==1) {
-				oCreature.whenCollide();
-				return 0;
-			} else if (type==0) {
-				Debug.Log ("I ran into a treasure box! Yay!");	
-				oTreasure.whenCollide();
-				return oTreasure.GetTreasure();
-			} else if (type == 2) {
-				oOxygen.whenCollide();
-				return 0;	
-			} else {
-				return -1;	
+		public int whenCollide(int objID, CellType type) {
+			
+			switch (type) {
+				
+			case CellType.Creature:
+				if (hasCreature)
+					return oCreature.whenCollide();
+				
+				break;
+				
+			case CellType.Treasure:
+				if (hasTreasure)
+					return oTreasure.whenCollide();
+				
+				break;
+				
+			case CellType.Oxygen:
+				if (hasOxygen)
+					return oOxygen.whenCollide();
+				
+				break;
 			}
+			
+			return 0;
 		} 
 		
 		bool isGenerateCreature(float top, float bottom) {
@@ -349,7 +372,7 @@ public class Grid : MonoBehaviour {
 		bool isGenerateTreasure(float top, float bottom) {
 			
 			if (top < 0) {
-				return (Random.Range (0.0f,1.0f) < 0.04f);
+				return (Random.Range (0.0f,1.0f) < 0.06f);
 			}
 			else {
 				return false;
@@ -393,12 +416,12 @@ public class Grid : MonoBehaviour {
 
 
 public abstract class Base {
-			
+	
 	protected int objID;
 	protected GameObject obj;
 	protected ObjStatus iStatus;
 	protected float fSpeed;
-	protected int iType;
+	protected int iType;	
 	protected int iDirection;
 	
 	float leftInitial = -17;
@@ -407,7 +430,6 @@ public abstract class Base {
 	float screenRight = 18;
 	
 	public Base(float top, float bottom) {
-		//iType = generateType(top, bottom);
 		iDirection = Random.Range(0, 2);
 		
 		obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -463,28 +485,28 @@ public abstract class Base {
 }
 
 public class TreasureBox: Base {
-	int weaponContained;
 	
 	public TreasureBox(float top, float bottom) : base(top, bottom) {
 		obj.tag = "TreasureBox";
 		iStatus = ObjStatus.Stop;
-		weaponContained = (int)Random.Range(1,4);		
+		iType = generateType(top, bottom, null);
 		Material mat = Resources.Load ("Materials/TreasureBox", typeof(Material)) as Material;
 		obj.renderer.material = mat;		
 		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 		fSpeed = 0;
 	}
 	
-	public int GetTreasure() {
-		return weaponContained;
-	}
-	
 	public override int whenCollide() {
+		
 		base.setStatus(ObjStatus.Invisible);
-		return weaponContained;
+		return iType;
 	}
 	
-	protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
+	protected override int generateType(float top, float bottom, Config oDetails) {
+		
+		return Random.Range(1, 8);
+	}
+	
 	protected override void changeDirection(int newDirection) {}
 }
 
@@ -492,15 +514,16 @@ public class TreasureBox: Base {
 public class OxygenCan: Base {
 	
 	public OxygenCan(float top, float bottom) : base(top, bottom) {
+		
 		obj.tag = "OxygenCan";
 		iStatus = ObjStatus.Stop;
 		Material mat = Resources.Load ("Materials/mOxygenCan", typeof(Material)) as Material;
 		obj.renderer.material = mat;
-		
 		obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
 	}
 	
 	public override int whenCollide() {
+		
 		base.setStatus(ObjStatus.Invisible);
 		return 0;
 	}
@@ -518,6 +541,7 @@ public class Creature : Base {
 	Player player;
 
 	public Creature(float top, float bottom, Config details) : base(top, bottom) {
+		
 		obj.tag = "Creature";
 		oCDetails = details;
 		iStatus = ObjStatus.Normal;
@@ -571,8 +595,7 @@ public class Creature : Base {
 		if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
 			
 			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
-				if(!player.Blink)
-					player.Life--;
+				player.Life--;
 				
 				if (player.Life <= 0) {
 					Application.LoadLevel("GameOver");
@@ -621,7 +644,7 @@ public class Creature : Base {
 		int[] indCat = new int[details.getCategorys().Length];
 		List<int> selectedIndex = new List<int>();
 		
-		float small = 0.4f,medium = 0.7f, large = 1.0f,probablity = 0.0f; 
+		float small, medium;
 		int category = 0, firstDepth = -125, secondDepth = -250; 
 		
 		float randNum = Random.Range(0.0f, 1.0f);
@@ -629,17 +652,14 @@ public class Creature : Base {
 		if(top > firstDepth){
 			small = 0.8f;
 			medium = 0.98f;
-			large = 1.0f;	
 		}
 		else if ((top < firstDepth) && (top > secondDepth)){
 			small = 0.4f;
 			medium = 0.9f;
-			large = 1.0f;
 		}
 		else{
 			small = 0.1f;
 			medium = 0.4f;
-			large = 1.0f;
 		}
 		
 		if(randNum < small)
