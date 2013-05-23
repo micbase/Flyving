@@ -25,7 +25,7 @@ public class MainMenu : MonoBehaviour
 			Application.LoadLevel ("main");
 		}
 		;
-		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 100) / 2, 150, 80), "Exit")) {
+		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 120) / 2, 150, 80), "Exit")) {
 			Application.Quit();
 		}
 	}

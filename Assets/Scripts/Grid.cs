@@ -63,68 +63,69 @@ public class Grid : MonoBehaviour {
 	
 	void Update () {
 		
-		float startPoint;
-		float endPoint;
-		int iStart = 0;
-		int iEnd = 0;
-		
-		//Update camera and background
-		oCamera.transform.Translate(0, gameSpeed, 0);
-		
-		if (oCamera.transform.localPosition.y < 0) {
-			oBlackPlane.renderer.enabled = true;
-			oBlackPlane.transform.Translate(0, gameSpeed, 0);
-		}
-		else {
-			oBlackPlane.renderer.enabled = false;
-		}
-		
-		if (oCamera.transform.localPosition.y > -500) {
+		if (!player.isPaused) {
+			float startPoint;
+			float endPoint;
+			int iStart = 0;
+			int iEnd = 0;
 			
-			oBlackPlane.renderer.material.color = new Color(0, 0, 0, (float)(Mathf.Abs(oCamera.transform.localPosition.y) * 0.3) / 255);
-		}
-
-		//Update the creatures inside the grid.
-		if (currentDirection == GameDirection.DivingDown ||
-			currentDirection == GameDirection.DivingUp) {
+			//Update camera and background
+			oCamera.transform.Translate(0, gameSpeed, 0);
+			
+			if (oCamera.transform.localPosition.y < 0) {
+				oBlackPlane.renderer.enabled = true;
+				oBlackPlane.transform.Translate(0, gameSpeed, 0);
+			}
+			else {
+				oBlackPlane.renderer.enabled = false;
+			}
+			
+			if (oCamera.transform.localPosition.y > -500) {
 				
-			startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
-			endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
-			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
-			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
-			
-			if (startPoint >= 0)
-				iStart = 0;
-			
-			if (iEnd > gridArraySea.Count) {
-				GenerateGrid();
-				iEnd = gridArraySea.Count;
+				oBlackPlane.renderer.material.color = new Color(0, 0, 0, (float)(Mathf.Abs(oCamera.transform.localPosition.y) * 0.3) / 255);
 			}
-			
-			for (int i = iStart; i < iEnd; i++ ) {
-				gridArraySea[i].Update();
-			}
-		}	
-		else if (currentDirection == GameDirection.FlyingUp ||
-			currentDirection == GameDirection.FlyingDown) {
-			
-			startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
-			endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
-			iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
-			iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
-			
-			if (startPoint <= 0)
-				iStart = 0;
-			
-			if (iEnd > gridArraySky.Count) {
-				GenerateGrid();
-				iEnd = gridArraySky.Count;
-			}
-			
+	
+			//Update the creatures inside the grid.
+			if (currentDirection == GameDirection.DivingDown ||
+				currentDirection == GameDirection.DivingUp) {
+					
+				startPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
+				endPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
+				iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+				iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+				
+				if (startPoint >= 0)
+					iStart = 0;
+				
+				if (iEnd > gridArraySea.Count) {
+					GenerateGrid();
+					iEnd = gridArraySea.Count;
+				}
+				
 				for (int i = iStart; i < iEnd; i++ ) {
-				gridArraySky[i].Update();
+					gridArraySea[i].Update();
+				}
+			}	
+			else if (currentDirection == GameDirection.FlyingUp ||
+				currentDirection == GameDirection.FlyingDown) {
+				
+				startPoint = oPlayer.transform.localPosition.y - (gridHeight + gridMargin) * 15;
+				endPoint = oPlayer.transform.localPosition.y + (gridHeight + gridMargin) * 15;
+				iStart = (int)Mathf.Abs(startPoint / (gridMargin + gridHeight));
+				iEnd = (int)Mathf.Abs(endPoint / (gridMargin + gridHeight));
+				
+				if (startPoint <= 0)
+					iStart = 0;
+				
+				if (iEnd > gridArraySky.Count) {
+					GenerateGrid();
+					iEnd = gridArraySky.Count;
+				}
+				
+					for (int i = iStart; i < iEnd; i++ ) {
+					gridArraySky[i].Update();
+				}
 			}
-			
 		}
 	}
 	
