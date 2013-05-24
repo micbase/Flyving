@@ -147,6 +147,12 @@ public class Player : MonoBehaviour {
             if (grid.CurrentDirection == GameDirection.DivingUp && oPlayer.transform.localPosition.y >= 0) {
                 grid.CurrentDirection = GameDirection.FlyingUp;
                 oBubble.renderer.enabled = false;
+                if (fOxygen > 0) {
+
+                    fFuel += fOxygen;
+                    if (fFuel > 30)
+                        fFuel = 30;
+                }
                 Debug.Log ("change to flying up");
             }
 

@@ -5,7 +5,7 @@ public class Dashboard : MonoBehaviour {
 
     public int iScore;
     GameObject oScore;
-    GameObject oOxygen;
+    GameObject oProgress;
 
     GameObject[] oLife;
     GameObject oWeaponIcon;
@@ -15,29 +15,26 @@ public class Dashboard : MonoBehaviour {
     GameObject oAlert;
 
     Player player;
+	Grid grid;
     int Max_Lives = 3;
 
-    private float height;
-    private float width;
-    private float x;
-    private float y;
-    private float currentx;
-    private float currenty;
-    private float currentz;
-    private float currentheight;
-    private int checkalert = 0;
+    Texture2D texture_blue;
+    Texture2D texture_yellow;
+    Texture2D texture_red;
 
+    private int checkalert = 0;
 
     void Start () {
 
         oScore = GameObject.Find("Score");
-        oOxygen = GameObject.Find("Oxygenbar");
+        oProgress = GameObject.Find("Progressbar");
         oWeaponIcon = GameObject.Find("WeaponIcon");
         oWeaponCount = GameObject.Find("WeaponCount");
         oEffectIcon = GameObject.Find("EffectIcon");
         oEffectCount = GameObject.Find("EffectCount");
 
         player = GameObject.Find("Player").GetComponent("Player") as Player;
+		grid = GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
 
         oAlert = GameObject.Find ("Alert");
         oAlert.guiText.material.color = Color.grey;
@@ -58,10 +55,10 @@ public class Dashboard : MonoBehaviour {
         iScore = 0;
         oScore.guiText.text = "30";
 
-        height = oOxygen.guiTexture.pixelInset.height;
-        width = oOxygen.guiTexture.pixelInset.width;
-        x = oOxygen.guiTexture.pixelInset.x;
-        y = oOxygen.guiTexture.pixelInset.y;
+        texture_blue = (Texture2D)Resources.Load ("Textures/oxygen_blue");
+        texture_yellow = (Texture2D)Resources.Load ("Textures/oxygen_yellow");
+        texture_red = (Texture2D)Resources.Load ("Textures/oxygen_red");
+
     }
 
     void Update () {
@@ -71,18 +68,25 @@ public class Dashboard : MonoBehaviour {
             //update score
             oScore.guiText.text = "Score: " + iScore.ToString ("0");
 
-            //TODO
-            currentx = oOxygen.transform.localPosition.x;
-            currenty = oOxygen.transform.localPosition.y + 0.000035f;
-            currentz = oOxygen.transform.localPosition.z;
-            oOxygen.transform.localPosition = new Vector3 (currentx, currenty, currentz);
+            //update progress bar
+            if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
+                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fOxygen / 30 * 200);
 
-            currentheight = height * player.fOxygen * 3.33F / 100;
-            oOxygen.guiTexture.pixelInset = new Rect (x, y, width, currentheight);
+                if (player.fOxygen / 30 < 0.5f)
+                    oProgress.guiTexture.texture = texture_red;
+                else
+                    oProgress.guiTexture.texture = texture_blue;
+            }
+            else {
+                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fFuel / 30 * 200);
+                oProgress.guiTexture.texture = texture_yellow;
+            }
 
             //update alert
-            if ((currentheight / height) <= 0.7f) {
-                oAlert.guiText.fontSize = 25;
+            if (player.fOxygen / 30 <= 0.5f) {
+				
+				oAlert.guiText.enabled = true;
+				
                 if (checkalert % 2 == 0) {
                     oAlert.guiText.material.color = Color.red;				
                 }
@@ -92,8 +96,7 @@ public class Dashboard : MonoBehaviour {
                 checkalert++;
             }
             else {
-                oAlert.guiText.material.color = Color.grey;
-                oAlert.guiText.fontSize = 1;
+                oAlert.guiText.enabled = false;
                 checkalert = 0;
             }
 
