@@ -82,7 +82,14 @@ public class Player : MonoBehaviour {
                     grid.speedFactor = 1;
                 }
 
-                currentEffect = PlayerEffect.noEffect;			
+                currentEffect = PlayerEffect.noEffect;
+                dashboard.updateEffectIcon();
+            }
+
+            if (weaponCount <= 0) {
+
+                currentWeapon = WeaponType.noWeapon;
+                dashboard.updateWeaponIcon();
             }
 
             if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
@@ -260,37 +267,44 @@ public class Player : MonoBehaviour {
 
                 case TreasureType.Gun:
                     currentWeapon = WeaponType.Gun;
+					dashboard.updateWeaponIcon();
                     weaponCount = 10;
                     break;
 
                 case TreasureType.Bomb:
                     currentWeapon = WeaponType.Bomb;
+					dashboard.updateWeaponIcon();
                     weaponCount = 3;
                     break;
 
                 case TreasureType.Spear:
                     currentWeapon = WeaponType.Spear;
+					dashboard.updateWeaponIcon();
                     weaponCount = 5;
                     break;
 
                 case TreasureType.Inverse:
                     currentEffect = PlayerEffect.Inverse;
+					dashboard.updateEffectIcon();
                     effectCount = 10;
                     break;
 
                 case TreasureType.Undefeat:
                     currentEffect = PlayerEffect.Undefeat;
+					dashboard.updateEffectIcon();
                     effectCount = 10;
                     break;
 
                 case TreasureType.SlowDown:
                     currentEffect = PlayerEffect.SlowDown;
+					dashboard.updateEffectIcon();
                     grid.speedFactor = 0.5f;
                     effectCount = 10;
                     break;
 
                 case TreasureType.SpeedUp:
                     currentEffect = PlayerEffect.SpeedUp;
+					dashboard.updateEffectIcon();
                     grid.speedFactor = 2;
                     effectCount = 10;
                     break;
@@ -323,6 +337,8 @@ public class Player : MonoBehaviour {
                     dashboard.updateLife(iLife);
                     currentWeapon = WeaponType.noWeapon;
                     currentEffect = PlayerEffect.noEffect;
+					dashboard.updateWeaponIcon();
+					dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
                 }
             }
