@@ -5,11 +5,11 @@ using System.IO;
 using System.Globalization;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
-public enum TreasureType { Gun = 1, Spear, Bomb, Inverse, Undefeat, SlowDown, SpeedUp };
+public enum TreasureType { Gun = 1, Spear, Bomb, Inverse, Undefeat, SlowDown, SpeedUp, Bigger, Dark };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
 public enum CellType { Creature = 1, Treasure, Oxygen };
-public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, noEffect };
+public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, Bigger, Dark, noEffect };
 
 public class Grid : MonoBehaviour {
 
@@ -80,11 +80,17 @@ public class Grid : MonoBehaviour {
             else {
                 oBlackPlane.renderer.enabled = false;
             }
-
-            if (oCamera.transform.localPosition.y > -500) {
-
-                oBlackPlane.renderer.material.color = new Color(0, 0, 0, (float)(Mathf.Abs(oCamera.transform.localPosition.y) * 0.3) / 255);
-            }
+			
+			if (player.currentEffect != PlayerEffect.Dark) {
+	            if (oCamera.transform.localPosition.y > -500) {
+	
+	                oBlackPlane.renderer.material.color = new Color(0, 0, 0, (float)(Mathf.Abs(oCamera.transform.localPosition.y) * 0.3) / 255);
+	            }
+				else {
+					
+					oBlackPlane.renderer.material.color = new Color(0, 0, 0, 0.588f);
+				}
+			}
 
             //Update the creatures inside the grid.
             if (currentDirection == GameDirection.DivingDown ||
@@ -505,7 +511,8 @@ public class TreasureBox: Base {
 
     protected override int generateType(float top, float bottom, Config oDetails) {
 
-        return Random.Range(1, 8);
+        return Random.Range(1, 9);
+		//return 9;
     }
 
     protected override void changeDirection(int newDirection) {}

@@ -13,14 +13,16 @@ public class Player : MonoBehaviour {
 
     public Texture2D MainBgPic;
     public GUISkin MenuGUIskins;
+	
     public GameObject projectilePrefab;
     public GameObject Bomb;
     public GameObject Spear;
+	
     public WeaponType currentWeapon;
     public PlayerEffect currentEffect;
     public float weaponCount = 0;
     public float effectCount = 0;
-
+	
     int iLife;
     public float fOxygen;
     public float fFuel;
@@ -63,6 +65,8 @@ public class Player : MonoBehaviour {
                 isPaused = false;    
             }
         }
+		
+
 
         if (!isPaused) {
 
@@ -74,13 +78,16 @@ public class Player : MonoBehaviour {
 
                 effectCount -= Time.deltaTime;
             }
-
+						
             if (effectCount <= 0) {
 
                 if (currentEffect == PlayerEffect.SlowDown || currentEffect == PlayerEffect.SpeedUp) {
 
                     grid.speedFactor = 1;
                 }
+				
+				if (currentEffect == PlayerEffect.Bigger)
+					oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);				
 
                 currentEffect = PlayerEffect.noEffect;
                 dashboard.updateEffectIcon();
@@ -308,6 +315,18 @@ public class Player : MonoBehaviour {
                     grid.speedFactor = 2;
                     effectCount = 10;
                     break;
+				
+			    case TreasureType.Bigger:
+					oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
+				    currentEffect = PlayerEffect.Bigger;
+                    effectCount = 10;
+                    break;
+				
+				case TreasureType.Dark:
+                	oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.6f);
+					currentEffect = PlayerEffect.Dark;
+					effectCount = 3;
+					break;
             }
         }
 
@@ -340,6 +359,7 @@ public class Player : MonoBehaviour {
 					dashboard.updateWeaponIcon();
 					dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
+					oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);	
                 }
             }
         }
