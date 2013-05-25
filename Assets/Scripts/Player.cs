@@ -13,16 +13,16 @@ public class Player : MonoBehaviour {
 
     public Texture2D MainBgPic;
     public GUISkin MenuGUIskins;
-	
+
     public GameObject projectilePrefab;
     public GameObject Bomb;
     public GameObject Spear;
-	
+
     public WeaponType currentWeapon;
     public PlayerEffect currentEffect;
     public float weaponCount = 0;
     public float effectCount = 0;
-	
+
     int iLife;
     public float fOxygen;
     public float fFuel;
@@ -52,7 +52,7 @@ public class Player : MonoBehaviour {
     }
 
     void Update () {
-		
+
         if (Input.GetKeyDown("escape")) {
 
             if (!isPaused) {
@@ -65,7 +65,7 @@ public class Player : MonoBehaviour {
                 isPaused = false;    
             }
         }
-		
+
 
 
         if (!isPaused) {
@@ -78,16 +78,16 @@ public class Player : MonoBehaviour {
 
                 effectCount -= Time.deltaTime;
             }
-						
+
             if (effectCount <= 0) {
 
                 if (currentEffect == PlayerEffect.SlowDown || currentEffect == PlayerEffect.SpeedUp) {
 
                     grid.speedFactor = 1;
                 }
-				
-				if (currentEffect == PlayerEffect.Bigger)
-					oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);				
+
+                if (currentEffect == PlayerEffect.Bigger)
+                    oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);				
 
                 currentEffect = PlayerEffect.noEffect;
                 dashboard.updateEffectIcon();
@@ -144,12 +144,12 @@ public class Player : MonoBehaviour {
 
             //changing game direction
             if (Input.GetKeyDown(KeyCode.Tab)) {
-				
+
                 if (grid.CurrentDirection == GameDirection.DivingDown) {
                     grid.CurrentDirection = GameDirection.DivingUp;
                     //oPlayer.transform.Rotate(0,180.0f,0);
                 }
-			}
+            }
 
             if (grid.CurrentDirection == GameDirection.DivingUp && oPlayer.transform.localPosition.y >= 0) {
                 grid.CurrentDirection = GameDirection.FlyingUp;
@@ -280,59 +280,63 @@ public class Player : MonoBehaviour {
 
                 case TreasureType.Gun:
                     currentWeapon = WeaponType.Gun;
-					dashboard.updateWeaponIcon();
+                    dashboard.updateWeaponIcon();
                     weaponCount = 10;
                     break;
 
                 case TreasureType.Bomb:
                     currentWeapon = WeaponType.Bomb;
-					dashboard.updateWeaponIcon();
+                    dashboard.updateWeaponIcon();
                     weaponCount = 3;
                     break;
 
                 case TreasureType.Spear:
                     currentWeapon = WeaponType.Spear;
-					dashboard.updateWeaponIcon();
+                    dashboard.updateWeaponIcon();
                     weaponCount = 5;
                     break;
 
                 case TreasureType.Inverse:
                     currentEffect = PlayerEffect.Inverse;
-					dashboard.updateEffectIcon();
+                    dashboard.updateEffectIcon();
+                    grid.speedFactor = 1;
                     effectCount = 10;
                     break;
 
                 case TreasureType.Undefeat:
                     currentEffect = PlayerEffect.Undefeat;
-					dashboard.updateEffectIcon();
+                    dashboard.updateEffectIcon();
+                    grid.speedFactor = 1;
                     effectCount = 10;
                     break;
 
                 case TreasureType.SlowDown:
                     currentEffect = PlayerEffect.SlowDown;
-					dashboard.updateEffectIcon();
+                    dashboard.updateEffectIcon();
                     grid.speedFactor = 0.5f;
                     effectCount = 10;
                     break;
 
                 case TreasureType.SpeedUp:
                     currentEffect = PlayerEffect.SpeedUp;
-					dashboard.updateEffectIcon();
+                    dashboard.updateEffectIcon();
                     grid.speedFactor = 2;
                     effectCount = 10;
                     break;
-				
-			    case TreasureType.Bigger:
-					oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
-				    currentEffect = PlayerEffect.Bigger;
+
+                case TreasureType.Bigger:
+                    oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
+                    currentEffect = PlayerEffect.Bigger;
+                    grid.speedFactor = 1;
                     effectCount = 10;
                     break;
-				
-				case TreasureType.Dark:
-                	oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.6f);
-					currentEffect = PlayerEffect.Dark;
-					effectCount = 3;
-					break;
+
+                case TreasureType.Dark:
+                    oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.6f);
+                    currentEffect = PlayerEffect.Dark;
+                    grid.speedFactor = 1;
+                    effectCount = 3;
+                    break;
             }
         }
 
@@ -362,10 +366,10 @@ public class Player : MonoBehaviour {
                     dashboard.updateLife(iLife);
                     currentWeapon = WeaponType.noWeapon;
                     currentEffect = PlayerEffect.noEffect;
-					dashboard.updateWeaponIcon();
-					dashboard.updateEffectIcon();
+                    dashboard.updateWeaponIcon();
+                    dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
-					oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);	
+                    oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);	
                 }
             }
         }
