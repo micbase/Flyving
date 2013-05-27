@@ -174,6 +174,8 @@ public class Player : MonoBehaviour {
                 grid.CurrentDirection = GameDirection.GameOver;
                 Debug.Log ("return to surface");
             }
+			if (grid.CurrentDirection == GameDirection.GameOver)
+				Application.LoadLevel("GameFinish");
 
             //using weapon
             if (currentWeapon == WeaponType.Gun) {
