@@ -17,7 +17,14 @@ public class Dashboard : MonoBehaviour {
     Player player;
 	Grid grid;
     int Max_Lives = 3;
-
+	
+	private int getTreasure = 0;  // 0: No Treasure ; 1: Weapon ; 2: Effect
+	private float timer_getTreasure = 0.0f;
+	private int AnimationTimes = 0;
+	private bool beginAnimation = false;
+	float IconWidth;
+	float IconHeight;
+	
     Texture2D texture_blue;
     Texture2D texture_yellow;
     Texture2D texture_red;
@@ -64,7 +71,66 @@ public class Dashboard : MonoBehaviour {
     void Update () {
 
         if (!player.isPaused) {
-
+			
+			if (!beginAnimation) {
+				timer_getTreasure = 0.0f;
+				AnimationTimes = 0;
+				oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,32.0f,32.0f);
+				oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.03f,0.0f);
+				oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,32.0f,32.0f);
+				oEffectIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.1f,0.0f);
+			}
+			else {
+			
+					Debug.Log(getTreasure);
+				if (getTreasure == 1) {
+					timer_getTreasure += Time.deltaTime;
+					oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.5f,0.5f,0.0f);
+					IconWidth = oWeaponIcon.guiTexture.pixelInset.width; 
+					IconHeight = oWeaponIcon.guiTexture.pixelInset.height; 
+					if (timer_getTreasure < 0.2f) {
+						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+10.0f,IconHeight+10.0f);
+						AnimationTimes++;
+							Debug.Log("step1");
+					}
+					else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0) {
+						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-10.0f,IconHeight-10.0f);
+						AnimationTimes--;
+							Debug.Log("step2");
+					}
+					else if (timer_getTreasure >= 0.5f) {
+						timer_getTreasure = 0.0f;
+						getTreasure = 0;
+						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,32.0f,32.0f);
+						oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.03f,0.0f);
+						beginAnimation = false;
+					}
+						
+				}
+				
+				if (getTreasure == 2) {
+					timer_getTreasure += Time.deltaTime;
+					oEffectIcon.guiTexture.transform.localPosition = new Vector3(0.5f,0.5f,0.0f);
+					IconWidth = oEffectIcon.guiTexture.pixelInset.width; 
+					IconHeight = oEffectIcon.guiTexture.pixelInset.height; 
+					if (timer_getTreasure < 0.2f) {
+						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+10.0f,IconHeight+10.0f);
+						AnimationTimes++;
+					}
+					else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0) {
+						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-10.0f,IconHeight-10.0f);
+						AnimationTimes--;
+					}
+					else if (timer_getTreasure >= 0.5f) {
+						timer_getTreasure = 0.0f;
+						getTreasure = 0;
+						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,32.0f,32.0f);
+						oEffectIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.1f,0.0f);
+						beginAnimation = false;
+					}
+				}
+			}
+			
             //update score
             oScore.guiText.text = "Score: " + iScore.ToString ("0");
 
@@ -132,7 +198,11 @@ public class Dashboard : MonoBehaviour {
     }
 
     public void updateWeaponIcon() {
-
+		
+		if (player.currentWeapon != WeaponType.noWeapon) {
+			beginAnimation = false;
+		}
+		
         switch (player.currentWeapon) {
 
             case WeaponType.Gun:
@@ -151,10 +221,20 @@ public class Dashboard : MonoBehaviour {
                 oWeaponIcon.guiTexture.texture = null;
                 break;
         }
+		
+		if (player.currentWeapon != WeaponType.noWeapon) {
+			Debug.Log("set weapon");
+			getTreasure = 1;
+			beginAnimation = true;
+		}
     }
 
     public void updateEffectIcon() {
-
+		
+		if (player.currentEffect != PlayerEffect.noEffect) {
+			beginAnimation = false;
+		}
+		
         switch (player.currentEffect) {
 
             case PlayerEffect.Inverse:
@@ -177,6 +257,11 @@ public class Dashboard : MonoBehaviour {
                 oEffectIcon.guiTexture.texture = null;
                 break;
         }
+		
+		if (player.currentEffect != PlayerEffect.noEffect) {
+			getTreasure = 2;
+			beginAnimation = true;
+		}
     }
 
 }
