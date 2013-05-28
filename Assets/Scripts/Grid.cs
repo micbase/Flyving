@@ -379,7 +379,7 @@ public class Grid : MonoBehaviour {
         bool isGenerateTreasure(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.06f);
+                return (Random.Range (0.0f,1.0f) < 0.9f);
             }
             else {
                 return false;
@@ -510,8 +510,9 @@ public class TreasureBox: Base {
     }
 
     protected override int generateType(float top, float bottom, Config oDetails) {
-
-        return Random.Range(1, 9);
+		
+		return 1;
+        //return Random.Range(1, 9);
 		//return 9;
     }
 

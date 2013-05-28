@@ -7,7 +7,6 @@ public class Player : MonoBehaviour {
     GameObject oCamera;
     GameObject oBubble;
     GameObject oBlackPlane;
-
     Grid grid;
     Dashboard dashboard;
 
@@ -26,7 +25,7 @@ public class Player : MonoBehaviour {
     int iLife;
     public float fOxygen;
     public float fFuel;
-
+	
     bool blink = false;
     float blinkTimeCount = 0;
 
@@ -69,7 +68,8 @@ public class Player : MonoBehaviour {
 
 
         if (!isPaused) {
-
+			
+			
             oPlayer.transform.Translate(0, grid.GameSpeed, 0);
             oBubble.transform.Translate(0, grid.GameSpeed, 0);
 
@@ -323,7 +323,6 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.SlowDown;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 0.5f;
-                    effectCount = 10;
                     break;
 
                 case TreasureType.SpeedUp:
@@ -348,6 +347,8 @@ public class Player : MonoBehaviour {
                     effectCount = 3;
                     break;
             }
+			
+			
         }
 
         if (collider.gameObject.tag == "OxygenCan") {
@@ -361,11 +362,11 @@ public class Player : MonoBehaviour {
         }
     }
 
-    private void resetWeapon {
+    void resetWeapon() {
 
     }
 
-    private void resetEffect {
+    void resetEffect() {
 
         grid.speedFactor = 1;
         oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);	
