@@ -7,7 +7,8 @@ public class Player : MonoBehaviour {
     GameObject oCamera;
     GameObject oBubble;
     GameObject oBlackPlane;
-
+	GameObject oWeaponIcon;
+	GameObject oEffectIcon;
     Grid grid;
     Dashboard dashboard;
 
@@ -26,7 +27,12 @@ public class Player : MonoBehaviour {
     int iLife;
     public float fOxygen;
     public float fFuel;
-
+	
+	private int getTreasure = 0;  // 0: No Treasure ; 1: Weapon ; 2: Effect
+	private float timer_getTreasure = 0.0f;
+	private int AnimationTimes = 0;
+	private bool beginanimation = false;
+	
     bool blink = false;
     float blinkTimeCount = 0;
 
@@ -44,6 +50,8 @@ public class Player : MonoBehaviour {
         oCamera = GameObject.Find ("Main Camera");
         oBubble = GameObject.Find ("Bubbles");
         oBlackPlane = GameObject.Find ("BlackPlane");
+		oWeaponIcon = GameObject.Find("WeaponIcon");
+		oEffectIcon = GameObject.Find("EffectIcon");
         currentWeapon = WeaponType.noWeapon;
         currentEffect = PlayerEffect.noEffect;
 
@@ -69,7 +77,45 @@ public class Player : MonoBehaviour {
 
 
         if (!isPaused) {
-
+			
+			if (getTreasure == 1) {
+				timer_getTreasure += Time.deltaTime;
+				oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.5f,0.5f,0.0f);
+				if (timer_getTreasure < 0.2f && beginanimation) {
+					oWeaponIcon.guiTexture.transform.localScale += new Vector3(0.1f,0.1f,0.1f);
+					AnimationTimes++;
+				}
+				else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0 && beginanimation) {
+					oWeaponIcon.guiTexture.transform.localScale -= new Vector3(0.1f,0.1f,0.1f);
+					AnimationTimes--;
+				}
+				else if (timer_getTreasure >= 0.5f && beginanimation) {
+					timer_getTreasure = 0.0f;
+					getTreasure = 0;
+					oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.03f,0.0f);
+					beginanimation = false;
+				}
+					
+			}
+			
+			if (getTreasure == 2) {
+				timer_getTreasure += Time.deltaTime;
+				oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.5f,0.5f,0.0f);
+				if (timer_getTreasure < 0.2f && beginanimation) {
+					oEffectIcon.guiTexture.transform.localScale += new Vector3(0.3f,0.3f,0.3f);
+					AnimationTimes++;
+				}
+				else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0 && beginanimation) {
+					oEffectIcon.guiTexture.transform.localScale -= new Vector3(0.1f,0.1f,0.1f);
+					AnimationTimes--;
+				}
+				else if (timer_getTreasure >= 0.5f && beginanimation) {
+					timer_getTreasure = 0.0f;
+					getTreasure = 0;
+					oEffectIcon.guiTexture.transform.localPosition = new Vector3(0.02f,0.1f,0.0f);
+					beginanimation = false;
+				}
+			}
             oPlayer.transform.Translate(0, grid.GameSpeed, 0);
             oBubble.transform.Translate(0, grid.GameSpeed, 0);
 
@@ -284,18 +330,21 @@ public class Player : MonoBehaviour {
                     currentWeapon = WeaponType.Gun;
                     dashboard.updateWeaponIcon();
                     weaponCount = 10;
+					getTreasure = 1;
                     break;
 
                 case TreasureType.Bomb:
                     currentWeapon = WeaponType.Bomb;
                     dashboard.updateWeaponIcon();
                     weaponCount = 3;
+					getTreasure = 1;
                     break;
 
                 case TreasureType.Spear:
                     currentWeapon = WeaponType.Spear;
                     dashboard.updateWeaponIcon();
                     weaponCount = 5;
+					getTreasure = 1;
                     break;
 
                 case TreasureType.Inverse:
@@ -303,6 +352,7 @@ public class Player : MonoBehaviour {
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
                     effectCount = 10;
+					getTreasure = 2;
                     break;
 
                 case TreasureType.Undefeat:
@@ -310,6 +360,7 @@ public class Player : MonoBehaviour {
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
                     effectCount = 10;
+					getTreasure = 2;
                     break;
 
                 case TreasureType.SlowDown:
@@ -324,6 +375,7 @@ public class Player : MonoBehaviour {
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 2;
                     effectCount = 10;
+					getTreasure = 2;
                     break;
 
                 case TreasureType.Bigger:
@@ -331,6 +383,7 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.Bigger;
                     grid.speedFactor = 1;
                     effectCount = 10;
+					getTreasure = 2;
                     break;
 
                 case TreasureType.Dark:
@@ -338,8 +391,12 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.Dark;
                     grid.speedFactor = 1;
                     effectCount = 3;
+					getTreasure = 2;
                     break;
             }
+			beginanimation = true;
+			
+			
         }
 
         if (collider.gameObject.tag == "OxygenCan") {
