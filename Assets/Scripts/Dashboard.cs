@@ -89,12 +89,12 @@ public class Dashboard : MonoBehaviour {
 					IconWidth = oWeaponIcon.guiTexture.pixelInset.width; 
 					IconHeight = oWeaponIcon.guiTexture.pixelInset.height; 
 					if (timer_getTreasure < 0.2f) {
-						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+10.0f,IconHeight+10.0f);
+						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+20.0f,IconHeight+20.0f);
 						AnimationTimes++;
 							Debug.Log("step1");
 					}
 					else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0) {
-						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-10.0f,IconHeight-10.0f);
+						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-20.0f,IconHeight-20.0f);
 						AnimationTimes--;
 							Debug.Log("step2");
 					}
@@ -114,14 +114,14 @@ public class Dashboard : MonoBehaviour {
 					IconWidth = oEffectIcon.guiTexture.pixelInset.width; 
 					IconHeight = oEffectIcon.guiTexture.pixelInset.height; 
 					if (timer_getTreasure < 0.2f) {
-						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+10.0f,IconHeight+10.0f);
+						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+20.0f,IconHeight+20.0f);
 						AnimationTimes++;
 					}
-					else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0) {
-						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-10.0f,IconHeight-10.0f);
+					else if (timer_getTreasure >= 0.4f &&	AnimationTimes > 0) {
+						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-20.0f,IconHeight-20.0f);
 						AnimationTimes--;
 					}
-					else if (timer_getTreasure >= 0.5f) {
+					else if (timer_getTreasure >= 0.6f) {
 						timer_getTreasure = 0.0f;
 						getTreasure = 0;
 						oEffectIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,32.0f,32.0f);
@@ -238,21 +238,28 @@ public class Dashboard : MonoBehaviour {
         switch (player.currentEffect) {
 
             case PlayerEffect.Inverse:
-                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/inverse");
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/inverse");
                 break;
 
             case PlayerEffect.Undefeat:
-                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/undefeat");
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/undefeat");
                 break;
 
             case PlayerEffect.SlowDown:
-                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/slowdown");
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/slowdown");
                 break;
 
             case PlayerEffect.SpeedUp:
-                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/speedup");
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/speedup");
                 break;
-
+			
+			case PlayerEffect.Dark:
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/dark");
+                break;
+			
+			case PlayerEffect.Bigger:
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/bigger");
+                break;
             default:
                 oEffectIcon.guiTexture.texture = null;
                 break;

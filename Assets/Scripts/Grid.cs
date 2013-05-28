@@ -511,8 +511,8 @@ public class TreasureBox: Base {
 
     protected override int generateType(float top, float bottom, Config oDetails) {
 		
-		return 1;
-        //return Random.Range(1, 9);
+		//return 1;
+        return Random.Range(1, 9);
 		//return 9;
     }
 

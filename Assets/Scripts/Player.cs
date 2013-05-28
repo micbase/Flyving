@@ -91,6 +91,8 @@ public class Player : MonoBehaviour {
 
                 currentEffect = PlayerEffect.noEffect;
                 dashboard.updateEffectIcon();
+				if (currentEffect == PlayerEffect.Dark)
+					oBlackPlane.transform.localPosition += new Vector3(0.0f, 0.0f, 2.0f);
             }
 
             if (weaponCount <= 0) {
@@ -333,7 +335,8 @@ public class Player : MonoBehaviour {
                     break;
 
                 case TreasureType.Dark:
-                    oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.6f);
+                    oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.8f);
+					oBlackPlane.transform.localPosition -= new Vector3(0.0f, 0.0f, 2.0f);
                     currentEffect = PlayerEffect.Dark;
                     grid.speedFactor = 1;
                     effectCount = 3;
