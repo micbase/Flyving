@@ -337,18 +337,19 @@ public class Player : MonoBehaviour {
                     resetEffect();
                     oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
                     currentEffect = PlayerEffect.Bigger;
+					dashboard.updateEffectIcon();
                     effectCount = 10;
                     break;
 
                 case TreasureType.Dark:
                     resetEffect();
-                    oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.6f);
+                    oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.8f);
+					oBlackPlane.transform.localPosition -= new Vector3(0.0f, 0.0f, 2.0f);
                     currentEffect = PlayerEffect.Dark;
+					dashboard.updateEffectIcon();
                     effectCount = 3;
                     break;
             }
-			
-			
         }
 
         if (collider.gameObject.tag == "OxygenCan") {
