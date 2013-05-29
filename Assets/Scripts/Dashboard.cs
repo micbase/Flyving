@@ -44,8 +44,6 @@ public class Dashboard : MonoBehaviour {
 		grid = GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
 
         oAlert = GameObject.Find ("Alert");
-        oAlert.guiText.material.color = Color.grey;
-        oAlert.guiText.fontSize = 1;
 
         Texture2D texture = (Texture2D)Resources.Load ("Textures/heart-icon");
         oLife = new GameObject[Max_Lives];

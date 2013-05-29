@@ -5,7 +5,7 @@ using System.IO;
 using System.Globalization;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
-public enum TreasureType { Gun = 1, Spear, Bomb, Inverse, Undefeat, SlowDown, SpeedUp, Bigger, Dark };
+public enum TreasureType { Gun = 1, Spear, Bomb, Undefeat, SlowDown, Inverse, SpeedUp, Bigger, Dark };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
 public enum CellType { Creature = 1, Treasure, Oxygen };
@@ -511,7 +511,10 @@ public class TreasureBox: Base {
 
     protected override int generateType(float top, float bottom, Config oDetails) {
 		
-        return Random.Range(1, 10);
+        if (top > -200)
+            return Random.Range(1, 6);
+        else
+            return Random.Range(1, 10);
     }
 
     protected override void changeDirection(int newDirection) {}
