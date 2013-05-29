@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class backtomainmenu : MonoBehaviour {
+public class Tutor : MonoBehaviour {
 
     public Texture2D MainBgPic;
     public GUISkin MenuGUIskins;
