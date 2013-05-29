@@ -148,21 +148,23 @@ public class Dashboard : MonoBehaviour {
             }
 
             //update alert
-            if (player.fOxygen / 30 <= 0.5f) {
-				
-				oAlert.guiText.enabled = true;
-				
-                if (checkalert % 2 == 0) {
-                    oAlert.guiText.material.color = Color.red;				
+            if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
+                if (player.fOxygen / 30 <= 0.5f) {
+
+                    oAlert.guiText.enabled = true;
+
+                    if (checkalert % 2 == 0) {
+                        oAlert.guiText.material.color = Color.red;				
+                    }
+                    else {
+                        oAlert.guiText.material.color = Color.yellow;				
+                    }
+                    checkalert++;
                 }
                 else {
-                    oAlert.guiText.material.color = Color.yellow;				
+                    oAlert.guiText.enabled = false;
+                    checkalert = 0;
                 }
-                checkalert++;
-            }
-            else {
-                oAlert.guiText.enabled = false;
-                checkalert = 0;
             }
 
             //update weapon count
