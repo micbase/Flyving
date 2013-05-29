@@ -77,28 +77,29 @@ public class Player : MonoBehaviour {
             if (currentEffect != PlayerEffect.noEffect) {
 
                 effectCount -= Time.deltaTime;
-            }
 
-            if (effectCount <= 0) {
+                if (effectCount <= 0) {
 
-                if (currentEffect == PlayerEffect.SlowDown || currentEffect == PlayerEffect.SpeedUp) {
+                    if (currentEffect == PlayerEffect.SlowDown || currentEffect == PlayerEffect.SpeedUp) {
 
-                    grid.speedFactor = 1;
+                        grid.speedFactor = 1;
+                    }
+
+                    if (currentEffect == PlayerEffect.Bigger)
+                        oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);				
+
+                    currentEffect = PlayerEffect.noEffect;
+                    dashboard.updateEffectIcon();
                 }
-
-                if (currentEffect == PlayerEffect.Bigger)
-                    oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);				
-
-                currentEffect = PlayerEffect.noEffect;
-                dashboard.updateEffectIcon();
-				if (currentEffect == PlayerEffect.Dark)
-					oBlackPlane.transform.localPosition += new Vector3(0.0f, 0.0f, 2.0f);
             }
 
-            if (weaponCount <= 0) {
+            if (currentWeapon != WeaponType.noWeapon) {
 
-                currentWeapon = WeaponType.noWeapon;
-                dashboard.updateWeaponIcon();
+                if (weaponCount <= 0) {
+
+                    currentWeapon = WeaponType.noWeapon;
+                    dashboard.updateWeaponIcon();
+                }
             }
 
             if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
@@ -322,44 +323,50 @@ public class Player : MonoBehaviour {
             switch (type) {
 
                 case TreasureType.Gun:
+                    resetWeapon();
                     currentWeapon = WeaponType.Gun;
                     dashboard.updateWeaponIcon();
                     weaponCount = 10;
                     break;
 
                 case TreasureType.Bomb:
+                    resetWeapon();
                     currentWeapon = WeaponType.Bomb;
                     dashboard.updateWeaponIcon();
                     weaponCount = 3;
                     break;
 
                 case TreasureType.Spear:
+                    resetWeapon();
                     currentWeapon = WeaponType.Spear;
                     dashboard.updateWeaponIcon();
                     weaponCount = 5;
                     break;
 
                 case TreasureType.Inverse:
+                    resetEffect();
                     currentEffect = PlayerEffect.Inverse;
                     dashboard.updateEffectIcon();
-                    grid.speedFactor = 1;
                     effectCount = 3;
+
                     break;
 
                 case TreasureType.Undefeat:
+                    resetEffect();
                     currentEffect = PlayerEffect.Undefeat;
                     dashboard.updateEffectIcon();
-                    grid.speedFactor = 1;
                     effectCount = 10;
                     break;
 
                 case TreasureType.SlowDown:
+                    resetEffect();
                     currentEffect = PlayerEffect.SlowDown;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 0.5f;
                     break;
 
                 case TreasureType.SpeedUp:
+                    resetEffect();
                     currentEffect = PlayerEffect.SpeedUp;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 2;
@@ -367,24 +374,22 @@ public class Player : MonoBehaviour {
                     break;
 
                 case TreasureType.Bigger:
+                    resetEffect();
                     oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
                     currentEffect = PlayerEffect.Bigger;
 					dashboard.updateEffectIcon();
-                    grid.speedFactor = 1;
                     effectCount = 5;
                     break;
 
                 case TreasureType.Dark:
+                    resetEffect();
                     oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.8f);
 					oBlackPlane.transform.localPosition -= new Vector3(0.0f, 0.0f, 2.0f);
                     currentEffect = PlayerEffect.Dark;
 					dashboard.updateEffectIcon();
-                    grid.speedFactor = 1;
                     effectCount = 3;
                     break;
             }
-			
-			
         }
 
         if (collider.gameObject.tag == "OxygenCan") {
@@ -396,6 +401,16 @@ public class Player : MonoBehaviour {
             if (fOxygen > 30)
                 fOxygen = 30;
         }
+    }
+
+    void resetWeapon() {
+
+    }
+
+    void resetEffect() {
+
+        grid.speedFactor = 1;
+        oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);	
     }
 
     public int Life {
@@ -413,10 +428,10 @@ public class Player : MonoBehaviour {
                     dashboard.updateLife(iLife);
                     currentWeapon = WeaponType.noWeapon;
                     currentEffect = PlayerEffect.noEffect;
+                    resetWeapon();
+                    resetEffect();
                     dashboard.updateWeaponIcon();
                     dashboard.updateEffectIcon();
-                    grid.speedFactor = 1;
-                    oPlayer.transform.localScale = new Vector3(3.0f, 3.0f, 0.0001f);
                 }
             }
         }
