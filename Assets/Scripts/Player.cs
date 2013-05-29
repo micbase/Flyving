@@ -127,13 +127,47 @@ public class Player : MonoBehaviour {
             }
             else {
                 if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+					if(grid.CurrentDirection == GameDirection.DivingUp){
+						Material mat = Resources.Load ("Materials/player/player_divingupleft", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+					else if(grid.CurrentDirection == GameDirection.FlyingUp){
+						Material mat = Resources.Load ("Materials/player/player_flyupleft", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
                     oPlayer.transform.Translate(-0.5F, 0, 0);
                     oBubble.transform.Translate(-0.5F, 0, 0);
                 }
                 else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+					if(grid.CurrentDirection == GameDirection.DivingUp){
+						Material mat = Resources.Load ("Materials/player/player_divingupright", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+					else if(grid.CurrentDirection == GameDirection.FlyingUp){
+						Material mat = Resources.Load ("Materials/player/player_flyupright", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
                     oPlayer.transform.Translate(0.5F, 0, 0);
                     oBubble.transform.Translate(0.5F, 0, 0);
                 }
+				else if(Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow)){
+					if(grid.CurrentDirection == GameDirection.DivingUp){
+						Material mat = Resources.Load ("Materials/player/player_divingup", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}	
+					else if(grid.CurrentDirection == GameDirection.DivingDown){
+						Material mat = Resources.Load ("Materials/player/player_divingdown2", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+					if(grid.CurrentDirection == GameDirection.FlyingUp){
+						Material mat = Resources.Load ("Materials/player/player_flyupback", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}	
+					else if(grid.CurrentDirection == GameDirection.FlyingDown){
+						Material mat = Resources.Load ("Materials/player/player_flydownback", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+				}
             }	
 
             if (Input.GetKey (KeyCode.UpArrow) && (oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) < 7.5) {
@@ -149,13 +183,18 @@ public class Player : MonoBehaviour {
 
                 if (grid.CurrentDirection == GameDirection.DivingDown) {
                     grid.CurrentDirection = GameDirection.DivingUp;
-                    //oPlayer.transform.Rotate(0,180.0f,0);
+					Material mat = Resources.Load ("Materials/player/player_divingup", typeof(Material)) as Material;
+					oPlayer.renderer.material = mat;
                 }
             }
 
             if (grid.CurrentDirection == GameDirection.DivingUp && oPlayer.transform.localPosition.y >= 0) {
                 grid.CurrentDirection = GameDirection.FlyingUp;
                 oBubble.renderer.enabled = false;
+				
+				Material mat = Resources.Load ("Materials/player/player_flyupback", typeof(Material)) as Material;
+				oPlayer.renderer.material = mat;
+				
                 if (fOxygen > 0) {
 
                     fFuel += fOxygen;
@@ -304,7 +343,7 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.Inverse;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
-                    effectCount = 10;
+                    effectCount = 3;
                     break;
 
                 case TreasureType.Undefeat:
@@ -324,7 +363,7 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.SpeedUp;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 2;
-                    effectCount = 10;
+                    effectCount = 5;
                     break;
 
                 case TreasureType.Bigger:
@@ -332,7 +371,7 @@ public class Player : MonoBehaviour {
                     currentEffect = PlayerEffect.Bigger;
 					dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
-                    effectCount = 10;
+                    effectCount = 5;
                     break;
 
                 case TreasureType.Dark:
