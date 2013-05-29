@@ -65,7 +65,9 @@ public class Dashboard : MonoBehaviour {
         texture_blue = (Texture2D)Resources.Load ("Textures/oxygen_blue");
         texture_yellow = (Texture2D)Resources.Load ("Textures/oxygen_yellow");
         texture_red = (Texture2D)Resources.Load ("Textures/oxygen_red");
-
+		
+		oEffectIcon.guiTexture.texture = null;
+		oWeaponIcon.guiTexture.texture = null;
     }
 
     void Update () {
