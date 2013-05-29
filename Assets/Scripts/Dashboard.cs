@@ -82,7 +82,6 @@ public class Dashboard : MonoBehaviour {
 			}
 			else {
 			
-					Debug.Log(getTreasure);
 				if (getTreasure == 1) {
 					timer_getTreasure += Time.deltaTime;
 					oWeaponIcon.guiTexture.transform.localPosition = new Vector3(0.5f,0.5f,0.0f);
@@ -254,12 +253,14 @@ public class Dashboard : MonoBehaviour {
                 break;
 			
 			case PlayerEffect.Dark:
+				Debug.Log ("dark");
                 oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/dark");
                 break;
 			
 			case PlayerEffect.Bigger:
                 oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/bigger");
                 break;
+			
             default:
                 oEffectIcon.guiTexture.texture = null;
                 break;

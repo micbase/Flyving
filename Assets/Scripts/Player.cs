@@ -330,6 +330,7 @@ public class Player : MonoBehaviour {
                 case TreasureType.Bigger:
                     oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
                     currentEffect = PlayerEffect.Bigger;
+					dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
                     effectCount = 10;
                     break;
@@ -338,6 +339,7 @@ public class Player : MonoBehaviour {
                     oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.8f);
 					oBlackPlane.transform.localPosition -= new Vector3(0.0f, 0.0f, 2.0f);
                     currentEffect = PlayerEffect.Dark;
+					dashboard.updateEffectIcon();
                     grid.speedFactor = 1;
                     effectCount = 3;
                     break;
