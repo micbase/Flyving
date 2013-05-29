@@ -21,8 +21,8 @@ public class MainMenu : MonoBehaviour
 			Application.LoadLevel ("main");
 		}
 		
-		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "Same to above one!")) {
-			Application.LoadLevel ("main");
+		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "View Scores")) {
+			Application.LoadLevel ("score");
 		}
 		;
 		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 120) / 2, 150, 80), "Exit")) {

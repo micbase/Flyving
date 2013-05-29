@@ -145,7 +145,7 @@ public class Dashboard : MonoBehaviour {
                     oProgress.guiTexture.texture = texture_blue;
             }
             else {
-                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fFuel / 30 * 200);
+                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fFuel / 10 * 200);
                 oProgress.guiTexture.texture = texture_yellow;
             }
 
