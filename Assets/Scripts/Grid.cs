@@ -379,7 +379,7 @@ public class Grid : MonoBehaviour {
         bool isGenerateTreasure(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.9f);
+                return (Random.Range (0.0f,1.0f) < 0.08f);
             }
             else {
                 return false;
@@ -389,7 +389,7 @@ public class Grid : MonoBehaviour {
         bool isGenerateOxygen(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.03f);
+                return (Random.Range (0.0f,1.0f) < 0.02f);
             }
             else {
                 return false;
