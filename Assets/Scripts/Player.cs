@@ -28,6 +28,7 @@ public class Player : MonoBehaviour {
 	
     bool blink = false;
     float blinkTimeCount = 0;
+	float flydowncount=0.0f;
 
     public bool isPaused = false;
     private float nativeVerticalResolution = 1200.0f;
@@ -101,6 +102,9 @@ public class Player : MonoBehaviour {
                     dashboard.updateWeaponIcon();
                 }
             }
+			if(grid.CurrentDirection == GameDirection.FlyingDown) {
+				flydowncount += Time.deltaTime;
+			}
 
             if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
 
@@ -136,6 +140,14 @@ public class Player : MonoBehaviour {
 						Material mat = Resources.Load ("Materials/player/player_flyupleft", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
 					}
+					else if(grid.CurrentDirection == GameDirection.FlyingDown && flydowncount < 1.0f){
+						Material mat = Resources.Load ("Materials/player/player_flydownmidleft", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+					else if(grid.CurrentDirection == GameDirection.FlyingDown && flydowncount >= 1.0f){
+						Material mat = Resources.Load ("Materials/player/player_flydownleft", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
                     oPlayer.transform.Translate(-0.5F, 0, 0);
                     oBubble.transform.Translate(-0.5F, 0, 0);
                 }
@@ -148,6 +160,15 @@ public class Player : MonoBehaviour {
 						Material mat = Resources.Load ("Materials/player/player_flyupright", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
 					}
+					else if(grid.CurrentDirection == GameDirection.FlyingDown && flydowncount < 1.0f){
+						Material mat = Resources.Load ("Materials/player/player_flydownmidright", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+					else if(grid.CurrentDirection == GameDirection.FlyingDown && flydowncount >= 1.0f){
+						Material mat = Resources.Load ("Materials/player/player_flydownright", typeof(Material)) as Material;
+						oPlayer.renderer.material = mat;
+					}
+				
                     oPlayer.transform.Translate(0.5F, 0, 0);
                     oBubble.transform.Translate(0.5F, 0, 0);
                 }
@@ -160,12 +181,12 @@ public class Player : MonoBehaviour {
 						Material mat = Resources.Load ("Materials/player/player_divingdown2", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
 					}
-					if(grid.CurrentDirection == GameDirection.FlyingUp){
-						Material mat = Resources.Load ("Materials/player/player_flyupback", typeof(Material)) as Material;
+					else if(grid.CurrentDirection == GameDirection.FlyingUp){
+						Material mat = Resources.Load ("Materials/player/player_flyupfront", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
 					}	
 					else if(grid.CurrentDirection == GameDirection.FlyingDown){
-						Material mat = Resources.Load ("Materials/player/player_flydownback", typeof(Material)) as Material;
+						Material mat = Resources.Load ("Materials/player/player_flydownfront", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
 					}
 				}

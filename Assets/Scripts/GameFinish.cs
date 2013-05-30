@@ -76,52 +76,52 @@ public class GameFinish : MonoBehaviour {
 		itypeofplayer = Random.Range(1,16);
 		switch(itypeofplayer) {
 		case 1:
-			obj.renderer.material=Resources.Load("Materials/player/player_divingdown1",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load("Materials/player_forFinal/player_divingdown1",typeof(Material)) as Material;
 			break;
 		case 2:
-			obj.renderer.material=Resources.Load ("Materials/player/player_divingdown2",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_divingdown2",typeof(Material)) as Material;
 			break;
 		case 3:
-			obj.renderer.material=Resources.Load ("Materials/player/player_divingup",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_divingup",typeof(Material)) as Material;
 			break;
 		case 4:
-			obj.renderer.material=Resources.Load ("Materials/player/player_divingupleft",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_divingupleft",typeof(Material)) as Material;
 			break;
 		case 5:
-			obj.renderer.material=Resources.Load ("Materials/player/player_divingupright",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_divingupright",typeof(Material)) as Material;
 			break;
 		case 6:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownback",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownback",typeof(Material)) as Material;
 			break;
 		case 7:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownfront",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownfront",typeof(Material)) as Material;
 			break;
 		case 8:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownleft",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownleft",typeof(Material)) as Material;
 			break;
 		case 9:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownright",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownright",typeof(Material)) as Material;
 			break;
 		case 10:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownmidleft",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownmidleft",typeof(Material)) as Material;
 			break;
 		case 11:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flydownmidright",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flydownmidright",typeof(Material)) as Material;
 			break;
 		case 12:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flyupback",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flyupback",typeof(Material)) as Material;
 			break;
 		case 13:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flyupfront",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flyupfront",typeof(Material)) as Material;
 			break;
 		case 14:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flyupleft",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flyupleft",typeof(Material)) as Material;
 			break;
 		case 15:
-			obj.renderer.material=Resources.Load ("Materials/player/player_flyupright",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_flyupright",typeof(Material)) as Material;
 			break;
 		case 16:
-			obj.renderer.material=Resources.Load ("Materials/player/player_standing",typeof(Material)) as Material;
+			obj.renderer.material=Resources.Load ("Materials/player_forFinal/player_standing",typeof(Material)) as Material;
 			break;
 		}
 					
