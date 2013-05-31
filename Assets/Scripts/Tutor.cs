@@ -10,8 +10,10 @@ public class Tutor : MonoBehaviour {
 	bool go_down = false;
 	bool go_up = false;
 	GameObject oCamera;
+	GameObject ofinalPlane;
     void Start () {
 		oCamera = GameObject.Find("Main Camera");
+		ofinalPlane = GameObject.Find("Plane9");
 		arrow_down = Resources.Load("Textures/arrow_down",typeof(Texture)) as Texture;
 		arrow_up = Resources.Load("Textures/arrow_up",typeof(Texture)) as Texture;
     }
@@ -25,6 +27,7 @@ public class Tutor : MonoBehaviour {
         if (GUI.Button (new Rect ((Screen.width) * 0.05f, (Screen.height) * 0.9f, 150, 80), "Go Back")) {
             Application.LoadLevel ("MainMenu");
         }
+		if ((oCamera.transform.localPosition.y - ofinalPlane.transform.localPosition.y) > 1.0f)
 		if (GUI.Button(new Rect((Screen.width) * 0.5f, (Screen.height) * 0.9f, 150, 80),arrow_down)) {
 			go_down = true;
 		}
