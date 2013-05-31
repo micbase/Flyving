@@ -14,8 +14,8 @@ public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, Bigger, Dar
 public class Grid : MonoBehaviour {
 
     public float speedFactor = 1;
-    float gameSpeed = -0.2f;
-    float baseSpeed = -0.2f;
+    float gameSpeed = -0.1f;
+    float baseSpeed = -0.1f;
 
     int gridSize;
     float gridMargin;
