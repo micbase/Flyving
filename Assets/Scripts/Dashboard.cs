@@ -217,7 +217,7 @@ public class Dashboard : MonoBehaviour {
                 break;
 
             default:
-                oWeaponIcon.guiTexture.texture = null;
+                oWeaponIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/shit");
                 break;
         }
 		
@@ -260,7 +260,7 @@ public class Dashboard : MonoBehaviour {
                 break;
 			
             default:
-                oEffectIcon.guiTexture.texture = null;
+                oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/shit");
                 break;
         }
 		
