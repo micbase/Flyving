@@ -90,12 +90,10 @@ public class Dashboard : MonoBehaviour {
 					if (timer_getTreasure < 0.2f) {
 						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth+20.0f,IconHeight+20.0f);
 						AnimationTimes++;
-							Debug.Log("step1");
 					}
 					else if (timer_getTreasure >= 0.3f &&	AnimationTimes > 0) {
 						oWeaponIcon.guiTexture.pixelInset = new Rect(0.0f,0.0f,IconWidth-20.0f,IconHeight-20.0f);
 						AnimationTimes--;
-							Debug.Log("step2");
 					}
 					else if (timer_getTreasure >= 0.5f) {
 						timer_getTreasure = 0.0f;
@@ -224,7 +222,6 @@ public class Dashboard : MonoBehaviour {
         }
 		
 		if (player.currentWeapon != WeaponType.noWeapon) {
-			Debug.Log("set weapon");
 			getTreasure = 1;
 			beginAnimation = true;
 		}
@@ -255,7 +252,6 @@ public class Dashboard : MonoBehaviour {
                 break;
 			
 			case PlayerEffect.Dark:
-				Debug.Log ("dark");
                 oEffectIcon.guiTexture.texture = (Texture2D)Resources.Load ("Textures/effect/dark");
                 break;
 			

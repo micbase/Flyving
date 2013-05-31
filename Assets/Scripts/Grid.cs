@@ -5,17 +5,18 @@ using System.IO;
 using System.Globalization;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
-public enum TreasureType { Gun = 1, Spear, Bomb, Undefeat, SlowDown, Inverse, SpeedUp, Bigger, Dark };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
+public enum CellType { Creature = 1, Weapon, Treasure, Oxygen, Star };
+public enum WeaponBoxType { Gun = 1, Spear, Bomb };
+public enum TreasureBoxType { Undefeat = 1, SlowDown, Inverse, SpeedUp, Bigger, Dark };
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
-public enum CellType { Creature = 1, Treasure, Oxygen, Star };
 public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, Bigger, Dark, noEffect };
 
 public class Grid : MonoBehaviour {
 
     public float speedFactor = 1;
-    float gameSpeed = -0.2f;
-    float baseSpeed = -0.2f;
+    float gameSpeed = -0.1f;
+    float baseSpeed = -0.1f;
 
     int gridSize;
     float gridMargin;
@@ -23,7 +24,7 @@ public class Grid : MonoBehaviour {
     float currentHeight;
     float currentBGHeight;
     float initialHeight = -15;
-    float initialBGHeight = -26.6f;
+    float initialBGHeight = -26f;
     List<GridCell> gridArraySea;
     List<GridCell> gridArraySky;
 
@@ -275,11 +276,13 @@ public class Grid : MonoBehaviour {
 
         bool hasCreature = false;
         bool hasTreasure = false;
+        bool hasWeapon = false;
         bool hasOxygen = false;
         bool hasStar = false;
 
         Creature oCreature = null;
         TreasureBox oTreasure = null;
+        WeaponBox oWeapon = null;
         OxygenCan oOxygen = null;
         Star oStar = null;
 
@@ -290,6 +293,10 @@ public class Grid : MonoBehaviour {
             hasCreature = isGenerateCreature(topPosition, bottomPosition);
             if (hasCreature)
                 oCreature = new Creature(topPosition, bottomPosition, objectDetail);
+
+            hasWeapon = isGenerateWeapon(topPosition, bottomPosition);
+            if (hasWeapon) 
+                oWeapon = new WeaponBox(topPosition, bottomPosition);
 
             hasTreasure = isGenerateTreasure(topPosition, bottomPosition);
             if (hasTreasure) 
@@ -350,6 +357,12 @@ public class Grid : MonoBehaviour {
 
                     break;
 
+                case CellType.Weapon:
+                    if (hasWeapon)
+                        return oWeapon.whenCollide();
+
+                    break;
+
                 case CellType.Treasure:
                     if (hasTreasure)
                         return oTreasure.whenCollide();
@@ -385,6 +398,16 @@ public class Grid : MonoBehaviour {
             }
             else {
                 return (Random.Range (0.0F, 1.0F) < 1.0F);
+            }
+        }
+
+        bool isGenerateWeapon(float top, float bottom) {
+
+            if (top < 0) {
+                return (Random.Range (0.0f,1.0f) < 0.1f);
+            }
+            else {
+                return false;
             }
         }
 
@@ -534,13 +557,40 @@ public class TreasureBox: Base {
     protected override int generateType(float top, float bottom, Config oDetails) {
 		
         if (top > -200)
-            return Random.Range(1, 6);
+            return Random.Range(1, 3);
         else
-            return Random.Range(1, 10);
+            return Random.Range(1, 7);
     }
 
     protected override void changeDirection(int newDirection) {}
 }
+
+public class WeaponBox: Base {
+
+    public WeaponBox(float top, float bottom) : base(top, bottom) {
+
+        obj.tag = "WeaponBox";
+        iStatus = ObjStatus.Stop;
+        iType = generateType(top, bottom, null);
+        Material mat = Resources.Load ("Materials/mWeapon", typeof(Material)) as Material;
+        obj.renderer.material = mat;
+        obj.transform.localScale = new Vector3(3.0f, 3.0f, 0.001F);
+    }
+
+    public override int whenCollide() {
+
+        base.setStatus(ObjStatus.Invisible);
+        return iType;
+    }
+
+    protected override int generateType(float top, float bottom, Config oDetails) {
+		
+        return Random.Range(1, 4);
+    }
+
+    protected override void changeDirection(int newDirection) {}
+}
+
 
 //Oxygen can class
 public class OxygenCan: Base {

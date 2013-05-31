@@ -112,7 +112,6 @@ public class Player : MonoBehaviour {
 
                 if (fOxygen <= 0) {
                     Application.LoadLevel("GameOver");
-                    Debug.Log("run out of oxygen");
                 }
             }
 
@@ -223,19 +222,14 @@ public class Player : MonoBehaviour {
                     if (fFuel > 10)
                         fFuel = 10;
                 }
-                Debug.Log ("change to flying up");
             }
 
             if (grid.CurrentDirection == GameDirection.FlyingUp && fFuel <= 0) {
                 grid.CurrentDirection = GameDirection.FlyingDown;
-                //oPlayer.transform.Rotate(0,180.0f,0);
-                //open parachute
-                Debug.Log("change to flying down");
             }
 
             if (grid.CurrentDirection == GameDirection.FlyingDown && oPlayer.transform.localPosition.y <= 0) {
                 grid.CurrentDirection = GameDirection.GameOver;
-                Debug.Log ("return to surface");
             }
 			if (grid.CurrentDirection == GameDirection.GameOver)
 				Application.LoadLevel("GameFinish");
@@ -341,36 +335,46 @@ public class Player : MonoBehaviour {
             screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Star);
         }
 
-        if (collider.gameObject.tag == "TreasureBox") {
+        if (collider.gameObject.tag == "WeaponBox") {
 
             Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
-            TreasureType type = (TreasureType)screenGrid.whenCollide(int.Parse(collider.gameObject.name), 
-                    collider.gameObject.transform.localPosition.y, CellType.Treasure);
+            WeaponBoxType type = (WeaponBoxType)screenGrid.whenCollide(int.Parse(collider.gameObject.name), 
+                    collider.gameObject.transform.localPosition.y, CellType.Weapon);
 
             switch (type) {
 
-                case TreasureType.Gun:
+                case WeaponBoxType.Gun:
                     resetWeapon();
                     currentWeapon = WeaponType.Gun;
                     dashboard.updateWeaponIcon();
                     weaponCount = 10;
                     break;
 
-                case TreasureType.Bomb:
-                    resetWeapon();
-                    currentWeapon = WeaponType.Bomb;
-                    dashboard.updateWeaponIcon();
-                    weaponCount = 3;
-                    break;
-
-                case TreasureType.Spear:
+                case WeaponBoxType.Spear:
                     resetWeapon();
                     currentWeapon = WeaponType.Spear;
                     dashboard.updateWeaponIcon();
                     weaponCount = 5;
                     break;
 
-                case TreasureType.Inverse:
+                case WeaponBoxType.Bomb:
+                    resetWeapon();
+                    currentWeapon = WeaponType.Bomb;
+                    dashboard.updateWeaponIcon();
+                    weaponCount = 3;
+                    break;
+            }
+        }
+
+        if (collider.gameObject.tag == "TreasureBox") {
+
+            Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+            TreasureBoxType type = (TreasureBoxType)screenGrid.whenCollide(int.Parse(collider.gameObject.name), 
+                    collider.gameObject.transform.localPosition.y, CellType.Treasure);
+
+            switch (type) {
+
+                case TreasureBoxType.Inverse:
                     resetEffect();
                     currentEffect = PlayerEffect.Inverse;
                     dashboard.updateEffectIcon();
@@ -378,21 +382,22 @@ public class Player : MonoBehaviour {
 
                     break;
 
-                case TreasureType.Undefeat:
+                case TreasureBoxType.Undefeat:
                     resetEffect();
                     currentEffect = PlayerEffect.Undefeat;
                     dashboard.updateEffectIcon();
                     effectCount = 10;
                     break;
 
-                case TreasureType.SlowDown:
+                case TreasureBoxType.SlowDown:
                     resetEffect();
                     currentEffect = PlayerEffect.SlowDown;
                     dashboard.updateEffectIcon();
                     grid.speedFactor = 0.5f;
+                    effectCount = 5;
                     break;
 
-                case TreasureType.SpeedUp:
+                case TreasureBoxType.SpeedUp:
                     resetEffect();
                     currentEffect = PlayerEffect.SpeedUp;
                     dashboard.updateEffectIcon();
@@ -400,7 +405,7 @@ public class Player : MonoBehaviour {
                     effectCount = 5;
                     break;
 
-                case TreasureType.Bigger:
+                case TreasureBoxType.Bigger:
                     resetEffect();
                     oPlayer.transform.localScale += new Vector3(1.0f ,1.0f ,0.001f);
                     currentEffect = PlayerEffect.Bigger;
@@ -408,7 +413,7 @@ public class Player : MonoBehaviour {
                     effectCount = 5;
                     break;
 
-                case TreasureType.Dark:
+                case TreasureBoxType.Dark:
                     resetEffect();
                     oBlackPlane.renderer.material.color = new Color (0, 0, 0, 0.8f);
 					oBlackPlane.transform.localPosition -= new Vector3(0.0f, 0.0f, 2.0f);
