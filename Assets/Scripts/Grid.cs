@@ -8,7 +8,7 @@ public enum ObjStatus { Normal = 1, Stop, Invisible };
 public enum TreasureType { Gun = 1, Spear, Bomb, Undefeat, SlowDown, Inverse, SpeedUp, Bigger, Dark };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
-public enum CellType { Creature = 1, Treasure, Oxygen };
+public enum CellType { Creature = 1, Treasure, Oxygen, Star };
 public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, Bigger, Dark, noEffect };
 
 public class Grid : MonoBehaviour {
@@ -276,11 +276,12 @@ public class Grid : MonoBehaviour {
         bool hasCreature = false;
         bool hasTreasure = false;
         bool hasOxygen = false;
+        bool hasStar = false;
 
         Creature oCreature = null;
         TreasureBox oTreasure = null;
         OxygenCan oOxygen = null;
-
+        Star oStar = null;
 
         public GridCell(float top, float bottom, Config objectDetail) {
             topPosition = top;
@@ -297,6 +298,11 @@ public class Grid : MonoBehaviour {
             hasOxygen = isGenerateOxygen(topPosition, bottomPosition);
             if (hasOxygen) {
                 oOxygen = new OxygenCan(topPosition, bottomPosition);
+            }
+
+            hasStar = isGenerateStar(topPosition, bottomPosition);
+            if (hasStar) {
+                oStar = new Star(topPosition, bottomPosition);
             }
         }
 
@@ -355,6 +361,12 @@ public class Grid : MonoBehaviour {
                         return oOxygen.whenCollide();
 
                     break;
+				
+                case CellType.Star:
+                    if (hasStar)
+                        return oStar.whenCollide();
+
+                    break;
             }
 
             return 0;
@@ -390,6 +402,16 @@ public class Grid : MonoBehaviour {
 
             if (top < 0) {
                 return (Random.Range (0.0f,1.0f) < 0.02f);
+            }
+            else {
+                return false;
+            }
+        }
+
+        bool isGenerateStar(float top, float bottom) {
+
+            if (top > 0) {
+                return (Random.Range (0.0f,1.0f) < 0.4f);
             }
             else {
                 return false;
@@ -534,6 +556,33 @@ public class OxygenCan: Base {
 
     public override int whenCollide() {
 
+        base.setStatus(ObjStatus.Invisible);
+        return 0;
+    }
+
+    protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
+    protected override void changeDirection(int newDirection) {}
+}
+
+public class Star: Base {
+
+    Dashboard dashBoard;
+
+    public Star(float top, float bottom) : base(top, bottom) {
+
+        obj.tag = "Star";
+        iStatus = ObjStatus.Stop;
+        Material mat = Resources.Load ("Materials/mStar", typeof(Material)) as Material;
+        obj.renderer.material = mat;
+        obj.transform.localScale = new Vector3(1.0f, 1.0f, 0.001F);
+        obj.transform.Rotate(0, 180, 0);
+
+        dashBoard = GameObject.Find("Main Camera").GetComponent("Dashboard") as Dashboard;
+    }
+
+    public override int whenCollide() {
+
+        dashBoard.iScore += 50;
         base.setStatus(ObjStatus.Invisible);
         return 0;
     }

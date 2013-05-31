@@ -335,6 +335,12 @@ public class Player : MonoBehaviour {
             screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Creature);
         }
 
+        if (collider.gameObject.tag == "Star") {
+
+            Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
+            screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Star);
+        }
+
         if (collider.gameObject.tag == "TreasureBox") {
 
             Grid screenGrid =  oCamera.GetComponent("Grid") as Grid;
