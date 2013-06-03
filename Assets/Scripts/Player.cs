@@ -37,7 +37,7 @@ public class Player : MonoBehaviour {
     void Start () {
 
         iLife = 3;
-        fOxygen = 30;
+        fOxygen = 60;
         fFuel = 5;
 
         oPlayer = GameObject.Find ("Player");
@@ -430,8 +430,8 @@ public class Player : MonoBehaviour {
             screenGrid.whenCollide(int.Parse(collider.gameObject.name), collider.gameObject.transform.localPosition.y, CellType.Oxygen);
 
             fOxygen += 10.0f;
-            if (fOxygen > 30)
-                fOxygen = 30;
+            if (fOxygen > 60)
+                fOxygen = 60;
         }
     }
 

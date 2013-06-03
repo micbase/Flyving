@@ -702,7 +702,13 @@ public class Creature : Base {
     public override int whenCollide() {
 
         if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
-
+			
+			if (oCDetails.getCategory(iType) == 0 && iStatus == ObjStatus.Normal) {
+				base.setStatus(ObjStatus.Stop);
+				dashBoard.iScore += oCDetails.getPoints(iType);
+				obj.transform.Rotate(0, 180, 0);	
+			}
+			
             if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
                 player.Life--;
 
@@ -712,8 +718,11 @@ public class Creature : Base {
 
                 }
             }
-        }
 
+        }
+		
+
+		
         if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
 
             if ((oCDetails.getCategory(iType) == 0 && iStatus != ObjStatus.Invisible) 

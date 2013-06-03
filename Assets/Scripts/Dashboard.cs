@@ -58,7 +58,7 @@ public class Dashboard : MonoBehaviour {
         }
 
         iScore = 0;
-        oScore.guiText.text = "30";
+        oScore.guiText.text = "60";
 
         texture_blue = (Texture2D)Resources.Load ("Textures/oxygen_blue");
         texture_yellow = (Texture2D)Resources.Load ("Textures/oxygen_yellow");
@@ -133,9 +133,9 @@ public class Dashboard : MonoBehaviour {
 
             //update progress bar
             if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
-                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fOxygen / 30 * 200);
+                oProgress.guiTexture.pixelInset = new Rect (0, 0, 38, player.fOxygen / 60 * 200);
 
-                if (player.fOxygen / 30 < 0.5f)
+                if (player.fOxygen / 60 < 0.5f)
                     oProgress.guiTexture.texture = texture_red;
                 else
                     oProgress.guiTexture.texture = texture_blue;
@@ -147,7 +147,7 @@ public class Dashboard : MonoBehaviour {
 
             //update alert
             if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.DivingUp) {
-                if (player.fOxygen / 30 <= 0.5f) {
+                if (player.fOxygen / 60 <= 0.5f) {
 
                     oAlert.guiText.enabled = true;
 
