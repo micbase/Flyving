@@ -7,6 +7,7 @@ public class Tutor : MonoBehaviour {
     public GUISkin MenuGUIskins;
 	Texture arrow_down;
 	Texture arrow_up;
+	Texture Back_button;
 	bool go_down = false;
 	bool go_up = false;
 	GameObject oCamera;
@@ -16,6 +17,8 @@ public class Tutor : MonoBehaviour {
 		ofinalPlane = GameObject.Find("Plane12");
 		arrow_down = Resources.Load("Textures/arrow_down",typeof(Texture)) as Texture;
 		arrow_up = Resources.Load("Textures/arrow_up",typeof(Texture)) as Texture;
+		Back_button = Resources.Load("Textures/Backbutton",typeof(Texture)) as Texture;
+		
     }
 
     void OnGUI ()
@@ -24,7 +27,7 @@ public class Tutor : MonoBehaviour {
         if (MainBgPic != null) {
             GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), MainBgPic);
         }
-        if (GUI.Button (new Rect ((Screen.width) * 0.05f, (Screen.height) * 0.9f, 150, 80), "Go Back")) {
+        if (GUI.Button (new Rect (0.0f, (Screen.height) * 0.9f, 150, 80), Back_button)) {
             Application.LoadLevel ("MainMenu");
         }
 		if ((oCamera.transform.localPosition.y - ofinalPlane.transform.localPosition.y) > 1.0f)
