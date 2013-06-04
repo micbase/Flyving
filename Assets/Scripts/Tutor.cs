@@ -13,7 +13,7 @@ public class Tutor : MonoBehaviour {
 	GameObject ofinalPlane;
     void Start () {
 		oCamera = GameObject.Find("Main Camera");
-		ofinalPlane = GameObject.Find("Plane9");
+		ofinalPlane = GameObject.Find("Plane12");
 		arrow_down = Resources.Load("Textures/arrow_down",typeof(Texture)) as Texture;
 		arrow_up = Resources.Load("Textures/arrow_up",typeof(Texture)) as Texture;
     }

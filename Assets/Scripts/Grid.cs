@@ -700,28 +700,24 @@ public class Creature : Base {
     }
 
     public override int whenCollide() {
-
-        if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
-			
+		
+		if (grid.CurrentDirection == GameDirection.DivingDown) {
 			if (oCDetails.getCategory(iType) == 0 && iStatus == ObjStatus.Normal) {
 				base.setStatus(ObjStatus.Stop);
 				dashBoard.iScore += oCDetails.getPoints(iType);
 				obj.transform.Rotate(0, 180, 0);	
-			}
-			
-            if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
+			}			
+		}
+		
+        if (grid.CurrentDirection == GameDirection.DivingDown || grid.CurrentDirection == GameDirection.FlyingDown) {
+			if (oCDetails.getCategory(iType) >= 1 && iStatus == ObjStatus.Normal) {
                 player.Life--;
-
                 if (player.Life <= 0) {
                     Application.LoadLevel("GameOver");
                     Debug.Log("die");
-
                 }
             }
-
         }
-		
-
 		
         if (grid.CurrentDirection == GameDirection.DivingUp || grid.CurrentDirection == GameDirection.FlyingUp) {
 
