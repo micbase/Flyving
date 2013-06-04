@@ -13,39 +13,48 @@ public class MainMenu : MonoBehaviour
 
 	void OnGUI () {
 		GUI.skin = MenuGUIskins;
-		//audio.Play();
-		//oaudio.audio.Play();
+
+		GUIStyle myButtonStyle = new GUIStyle(GUI.skin.button);
+
+        // Load and set Font
+        Font myFont = (Font)Resources.Load("Font/HoboStd", typeof(Font));
+        myButtonStyle.font = myFont;
+
+        // Set color for selected and unselected buttons
+        myButtonStyle.normal.textColor = Color.white;
+        myButtonStyle.hover.textColor = Color.red;
+		
 		if (MainBgPic != null) {
 			GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), MainBgPic);
 		}
 		if (!Button2) {
-			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 260) / 2, 150, 80), "Quick Start!")) {
+			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 260) / 2, 150, 80), "Quick Start!", myButtonStyle)) {
 				Application.LoadLevel ("main");
 			}
 		
 		//if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "View Scores")) {
 		//Application.LoadLevel ("score");
-			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "Game Facts")) {
+			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "Game Facts", myButtonStyle)) {
 				Application.LoadLevel ("tutor");
 			}
 		}
-		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 100) / 2, 150, 80), "Different Level")) {
+		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 100) / 2, 150, 80), "Different Level", myButtonStyle)) {
 			Button2 = true;
 		}
 		if (!Button2) {
-			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 280) / 2, 150, 80), "Exit")) {
+			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 280) / 2, 150, 80), "Exit", myButtonStyle)) {
 				Application.Quit ();
 			}
 		}
 		
 		if (Button2) {
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 260) / 2, 150, 80), "Level1")) {
+			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 260) / 2, 150, 80), "Level1", myButtonStyle)) {
 			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 80) / 2, 150, 80), "Level2")) {				
+			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 80) / 2, 150, 80), "Level2", myButtonStyle)) {				
 			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 100) / 2, 150, 80), "Level3")) {				
+			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 100) / 2, 150, 80), "Level3", myButtonStyle)) {				
 			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 280) / 2, 150, 80), "Back")) {				
+			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 280) / 2, 150, 80), "Back", myButtonStyle)) {				
 				Button2 = false;
 			}
 			
