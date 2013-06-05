@@ -1,0 +1,16 @@
+{
+    "base_speed": -0.15,
+    "first_creature_prob": 0.4,
+    "second_creature_prob": 0.8,
+    "third_creature_prob": 1.0,
+    "weapon_prob": 0.1,
+    "treasure_prob": 0.1,
+    "oxygen_prob": 0.03,
+    "star_prob": 0.6,
+    "first_small_prob": 0.9,
+    "first_medium_prob": 0.98,
+    "second_small_prob": 0.7,
+    "second_medium_prob": 0.9,
+    "third_small_prob": 0.5,
+    "third_medium_prob": 0.9,
+}
