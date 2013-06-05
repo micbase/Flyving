@@ -1,0 +1,56 @@
+{
+    "fish": [{
+            "type": "tuna",
+            "width": 1,
+            "heigh": 1,
+            "min_speed": 0.2,
+            "max_speed": 0.3,
+            "health": 10,
+            "points": 20,
+            "cagetory": 0
+        }, {
+            "type": "tuna",
+            "width": 1,
+            "heigh": 1,
+            "min_speed": 0.2,
+            "max_speed": 0.3,
+            "health": 10,
+            "points": 20,
+            "cagetory": 0
+        }
+    ],
+    "birds": [{
+            "type": "tuna",
+            "width": 1,
+            "heigh": 1,
+            "min_speed": 0.2,
+            "max_speed": 0.3,
+            "health": 10,
+            "points": 20,
+            "cagetory": 0
+        }, {
+            "type": "tuna",
+            "width": 1,
+            "heigh": 1,
+            "min_speed": 0.2,
+            "max_speed": 0.3,
+            "health": 10,
+            "points": 20,
+            "cagetory": 0
+        }
+    ],
+    "base_speed": 0.2,
+    "first_creature_prob": 0.8,
+    "second_creature_prob": 0.8,
+    "third_creature_prob": 0.8,
+    "weapon_prob": 0.8,
+    "treasure_prob": 0.8,
+    "oxygen_prob": 0.8,
+    "star_prob": 0.8,
+    "first_small_prob": 0.4,
+    "first_medium_prob": 0.4,
+    "second_small_prob": 0.4,
+    "second_medium_prob": 0.4,
+    "third_small_prob": 0.4,
+    "third_medium_prob": 0.4,
+}
