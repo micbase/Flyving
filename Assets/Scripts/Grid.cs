@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
+using MiniJSON;
 
 public enum ObjStatus { Normal = 1, Stop, Invisible };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
@@ -12,7 +13,14 @@ public enum TreasureBoxType { Undefeat = 1, SlowDown, Inverse, SpeedUp, Bigger, 
 public enum WeaponType { Gun = 1, Bomb, Spear, noWeapon };
 public enum PlayerEffect { Inverse = 1, Undefeat, SlowDown, SpeedUp, Bigger, Dark, noEffect };
 
+public class ApplicationModel : MonoBehaviour
+{
+     static public string levelPath = "Assets/Resources/level1.txt";
+}
+
 public class Grid : MonoBehaviour {
+
+    static string levelPath;
 
     public float speedFactor = 1;
     float gameSpeed = -0.1f;
@@ -33,12 +41,13 @@ public class Grid : MonoBehaviour {
     GameObject oBlackPlane;
 
     Config[] objectDetails;
+    LevelConfig levelConfig;
     GameDirection currentDirection;
 
     Player player;
 
     void Start () {
-
+		
         oPlayer = GameObject.Find("Player");
         oCamera = GameObject.Find("Main Camera");
         oBlackPlane = GameObject.Find("BlackPlane");
@@ -48,6 +57,9 @@ public class Grid : MonoBehaviour {
         objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
         objectDetails[1] = new Config("Assets/Resources/allbird.txt");
+
+		levelConfig = new LevelConfig();
+        changeLevel(ApplicationModel.levelPath);
 
         gridSize = 20;
         gridMargin = 1;
@@ -137,6 +149,13 @@ public class Grid : MonoBehaviour {
         }
     }
 
+    public void changeLevel(string filePath) {
+
+        levelConfig.loadLevel(filePath);
+        gameSpeed = levelConfig.get_base_speed();
+        baseSpeed = levelConfig.get_base_speed();
+    }
+
     public GameDirection CurrentDirection {
         get {
             return currentDirection;
@@ -174,7 +193,7 @@ public class Grid : MonoBehaviour {
 
         if (currentDirection == GameDirection.DivingDown) {
             for (int i = 0; i < gridSize; i++) {
-                gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails[0]));
+                gridArraySea.Add(new GridCell(currentHeight, currentHeight - gridHeight, objectDetails[0], levelConfig));
                 currentHeight -= gridMargin + gridHeight;
             }
 
@@ -184,7 +203,7 @@ public class Grid : MonoBehaviour {
         }
         else if (currentDirection == GameDirection.FlyingUp) {
             for (int i = 0; i < gridSize; i++) {
-                gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails[1]));
+                gridArraySky.Add(new GridCell(currentHeight, currentHeight + gridHeight, objectDetails[1], levelConfig));
                 currentHeight += gridMargin + gridHeight;
             }
 
@@ -255,7 +274,6 @@ public class Grid : MonoBehaviour {
     }
 
     public int whenCollide(int objID, float top, CellType type) {
-        StartCoroutine(FlashWhenHit());
 
         if (currentDirection == GameDirection.DivingDown || currentDirection == GameDirection.DivingUp) {
             int index = Mathf.CeilToInt((initialHeight - top) / (gridMargin + gridHeight)) - 1;
@@ -286,13 +304,16 @@ public class Grid : MonoBehaviour {
         OxygenCan oOxygen = null;
         Star oStar = null;
 
-        public GridCell(float top, float bottom, Config objectDetail) {
+        LevelConfig levelConfig;
+
+        public GridCell(float top, float bottom, Config objectDetail, LevelConfig config) {
             topPosition = top;
             bottomPosition = bottom;
+            levelConfig = config;
 
             hasCreature = isGenerateCreature(topPosition, bottomPosition);
             if (hasCreature)
-                oCreature = new Creature(topPosition, bottomPosition, objectDetail);
+                oCreature = new Creature(topPosition, bottomPosition, objectDetail, levelConfig);
 
             hasWeapon = isGenerateWeapon(topPosition, bottomPosition);
             if (hasWeapon) 
@@ -388,23 +409,20 @@ public class Grid : MonoBehaviour {
         bool isGenerateCreature(float top, float bottom) {
 
             if (top > -150 || top < 150) {
-                return (Random.Range (0.0F, 1.0F) < 0.4F);
-            }
-            else if (top > -200 || top < 200) {
-                return (Random.Range (0.0F, 1.0F) < 0.6F);
+                return (Random.Range (0.0F, 1.0F) < levelConfig.get_first_creature_prob());
             }
             else if (top > -300 || top < 300) {
-                return (Random.Range (0.0F, 1.0F) < 0.8F);
+                return (Random.Range (0.0F, 1.0F) < levelConfig.get_second_creature_prob());
             }
             else {
-                return (Random.Range (0.0F, 1.0F) < 1.0F);
+                return (Random.Range (0.0F, 1.0F) < levelConfig.get_third_creature_prob());
             }
         }
 
         bool isGenerateWeapon(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.1f);
+                return (Random.Range (0.0f,1.0f) < levelConfig.get_weapon_prob());
             }
             else {
                 return false;
@@ -414,7 +432,7 @@ public class Grid : MonoBehaviour {
         bool isGenerateTreasure(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.08f);
+                return (Random.Range (0.0f,1.0f) < levelConfig.get_treasure_prob());
             }
             else {
                 return false;
@@ -424,7 +442,7 @@ public class Grid : MonoBehaviour {
         bool isGenerateOxygen(float top, float bottom) {
 
             if (top < 0) {
-                return (Random.Range (0.0f,1.0f) < 0.02f);
+                return (Random.Range (0.0f,1.0f) < levelConfig.get_oxygen_prob());
             }
             else {
                 return false;
@@ -434,38 +452,14 @@ public class Grid : MonoBehaviour {
         bool isGenerateStar(float top, float bottom) {
 
             if (top > 0) {
-                return (Random.Range (0.0f,1.0f) < 0.4f);
+                return (Random.Range (0.0f,1.0f) < levelConfig.get_star_prob());
             }
             else {
                 return false;
             }
         }
     }
-
-    public IEnumerator Fade (float start, float end, float length, GameObject currentObject) { //define Fade parmeters
-        if (currentObject.guiTexture.color.a == start){
-            for (float i = 0.0f; i < 1.0f; i += Time.deltaTime*(1/length)) { //for the length of time
-
-                Color temp; // temporary variable
-                temp = currentObject.guiTexture.color;
-                temp.a = Mathf.Lerp(start, end, i); // start appearing when health < 100%
-                yield return true;
-                temp.a = end;
-                currentObject.guiTexture.color = temp;
-
-            } //end for 
-        } //end if
-
-    } //end Fade
-
-    public IEnumerator FlashWhenHit(){
-        GameObject oTexture = GameObject.Find("Oxygenbar");
-        Fade (0, 0.8f, 0.5f, oTexture);
-        yield return new WaitForSeconds (.01f);
-        Fade (0.8f, 0, 0.5f, oTexture);
-    }
 }
-
 
 public abstract class Base {
 
@@ -648,11 +642,13 @@ public class Creature : Base {
     Dashboard dashBoard;
     Grid grid;
     Player player;
+    LevelConfig levelConfig;
 
-    public Creature(float top, float bottom, Config details) : base(top, bottom) {
+    public Creature(float top, float bottom, Config details, LevelConfig config) : base(top, bottom) {
 
         obj.tag = "Creature";
         oCDetails = details;
+        levelConfig = config;
         iStatus = ObjStatus.Normal;
         iType = generateType(top, bottom, oCDetails);
         iHealth = oCDetails.getHealth(iType);
@@ -759,21 +755,21 @@ public class Creature : Base {
         List<int> selectedIndex = new List<int>();
 
         float small, medium;
-        int category = 0, firstDepth = -125, secondDepth = -250; 
+        int category = 0, firstDepth = -150, secondDepth = -300; 
 
         float randNum = Random.Range(0.0f, 1.0f);
 
-        if(top > firstDepth){
-            small = 0.8f;
-            medium = 0.98f;
+        if (top > firstDepth || top < Mathf.Abs(firstDepth)) {
+            small = levelConfig.get_first_small_prob();
+            medium = levelConfig.get_first_medium_prob();
         }
-        else if ((top < firstDepth) && (top > secondDepth)){
-            small = 0.4f;
-            medium = 0.9f;
+        else if (top > secondDepth || top < Mathf.Abs(secondDepth)) {
+            small = levelConfig.get_second_small_prob();
+            medium = levelConfig.get_second_medium_prob();
         }
-        else{
-            small = 0.1f;
-            medium = 0.4f;
+        else {
+            small = levelConfig.get_third_small_prob();
+            medium = levelConfig.get_third_medium_prob();
         }
 
         if(randNum < small)
@@ -797,8 +793,6 @@ public class Creature : Base {
 
         return index;
     }
-
-
 }
 
 public class Config{
@@ -881,5 +875,101 @@ public class Config{
 
     public int[] getCategorys(){
         return category;
+    }
+}
+
+public class LevelConfig {
+
+    float base_speed;
+    float first_creature_prob;
+    float second_creature_prob;
+    float third_creature_prob;
+    float weapon_prob;
+    float treasure_prob;
+    float oxygen_prob;
+    float star_prob;
+    float first_small_prob;
+    float first_medium_prob;
+    float second_small_prob;
+    float second_medium_prob;
+    float third_small_prob;
+    float third_medium_prob;
+
+    public void loadLevel(string filePath) {
+
+        StreamReader sr = new StreamReader(filePath);
+        string raw_data = sr.ReadToEnd();
+        IDictionary data = (IDictionary) Json.Deserialize(raw_data);
+
+        base_speed           = float.Parse(data["base_speed"].ToString());
+        first_creature_prob  = float.Parse(data["first_creature_prob"].ToString());
+        second_creature_prob = float.Parse(data["second_creature_prob"].ToString());
+        third_creature_prob  = float.Parse(data["third_creature_prob"].ToString());
+        weapon_prob          = float.Parse(data["weapon_prob"].ToString());
+        treasure_prob        = float.Parse(data["treasure_prob"].ToString());
+        oxygen_prob          = float.Parse(data["oxygen_prob"].ToString());
+        star_prob            = float.Parse(data["star_prob"].ToString());
+        first_small_prob     = float.Parse(data["first_small_prob"].ToString());
+        first_medium_prob    = float.Parse(data["first_medium_prob"].ToString());
+        second_small_prob    = float.Parse(data["second_small_prob"].ToString());
+        second_medium_prob   = float.Parse(data["second_medium_prob"].ToString());
+        third_small_prob     = float.Parse(data["third_small_prob"].ToString());
+        third_medium_prob    = float.Parse(data["third_medium_prob"].ToString());
+    }
+
+    public float get_base_speed() {
+        return base_speed;
+    }
+
+    public float get_first_creature_prob() {
+        return first_creature_prob;
+    }
+
+    public float get_second_creature_prob() {
+        return second_creature_prob;
+    }
+
+    public float get_third_creature_prob() {
+        return third_creature_prob;
+    }
+
+    public float get_weapon_prob() {
+        return weapon_prob;
+    }
+
+    public float get_treasure_prob() {
+        return treasure_prob;
+    }
+
+    public float get_oxygen_prob() {
+        return oxygen_prob;
+    }
+
+    public float get_star_prob() {
+        return star_prob;
+    }
+
+    public float get_first_small_prob() {
+        return first_small_prob;
+    }
+
+    public float get_first_medium_prob() {
+        return first_medium_prob;
+    }
+
+    public float get_second_small_prob() {
+        return second_small_prob;
+    }
+
+    public float get_second_medium_prob() {
+        return second_medium_prob;
+    }
+
+    public float get_third_small_prob() {
+        return third_small_prob;
+    }
+
+    public float get_third_medium_prob() {
+        return third_medium_prob;
     }
 }
