@@ -303,20 +303,15 @@ public class Player : MonoBehaviour {
             if (MainBgPic != null) {
                 GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), MainBgPic);
             }
-            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 260) / 2, 400, 200), "Quit",myButtonStyle)) {
-                //print ("Quit!");
-                Application.Quit ();
-            }
-            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height +140) / 2, 400, 200), "Restart",myButtonStyle)) {
-                //print ("Restart");
-                Application.LoadLevel ("main");
-                Time.timeScale = 1.0f;
-                isPaused = false;
-            }
-            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 540) / 2, 400, 200), "Continue",myButtonStyle)) {
-                //print ("Continue");
+            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 260) / 2, 400, 200), "Continue",myButtonStyle)) {
                 Time.timeScale = 1.0f;
                 isPaused = false;   
+            }
+            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height +140) / 2, 400, 200), "Restart",myButtonStyle)) {
+                Application.LoadLevel ("Main");
+            }
+            if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 540) / 2, 400, 200), "Main Menu",myButtonStyle)) {
+                Application.LoadLevel ("MainMenu");
             }
         } 
     }

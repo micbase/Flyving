@@ -481,7 +481,7 @@ public abstract class Base {
         obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
         objID = this.GetHashCode();
         obj.name = objID.ToString();
-        obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);	
+        obj.transform.position = new Vector3(Random.Range(leftInitial, rightInitial), Random.Range (top, bottom), 0);
     }
 
     public void setStatus(ObjStatus status) {
