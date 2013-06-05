@@ -57,6 +57,14 @@ public class Tutor : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Escape)) 
             Application.LoadLevel("MainMenu");
+		if (oCamera.transform.localPosition.y < -5.0f)
+			if (Input.GetKeyDown(KeyCode.UpArrow))
+				go_up = true;
+		if ((oCamera.transform.localPosition.y - ofinalPlane.transform.localPosition.y) > 1.0f)
+			if (Input.GetKeyDown(KeyCode.DownArrow))
+				go_down = true;
+			
+
 
     }
 }
