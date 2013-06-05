@@ -1,44 +1,4 @@
 {
-    "fish": [{
-            "type": "tuna",
-            "width": 1,
-            "heigh": 1,
-            "min_speed": 0.2,
-            "max_speed": 0.3,
-            "health": 10,
-            "points": 20,
-            "cagetory": 0
-        }, {
-            "type": "tuna",
-            "width": 1,
-            "heigh": 1,
-            "min_speed": 0.2,
-            "max_speed": 0.3,
-            "health": 10,
-            "points": 20,
-            "cagetory": 0
-        }
-    ],
-    "birds": [{
-            "type": "tuna",
-            "width": 1,
-            "heigh": 1,
-            "min_speed": 0.2,
-            "max_speed": 0.3,
-            "health": 10,
-            "points": 20,
-            "cagetory": 0
-        }, {
-            "type": "tuna",
-            "width": 1,
-            "heigh": 1,
-            "min_speed": 0.2,
-            "max_speed": 0.3,
-            "health": 10,
-            "points": 20,
-            "cagetory": 0
-        }
-    ],
     "base_speed": 0.2,
     "first_creature_prob": 0.8,
     "second_creature_prob": 0.8,
