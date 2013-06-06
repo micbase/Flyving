@@ -5,7 +5,7 @@ using System.IO;
 using System.Globalization;
 using MiniJSON;
 
-public enum ObjStatus { Normal = 1, Stop, Invisible };
+public enum ObjStatus { Normal = 1, Stop, Invisible, Hide };
 public enum GameDirection { DivingDown = 1, DivingUp, FlyingUp, FlyingDown, GameOver };
 public enum CellType { Creature = 1, Weapon, Treasure, Oxygen, Star };
 public enum WeaponBoxType { Gun = 1, Spear, Bomb };
@@ -338,6 +338,9 @@ public class Grid : MonoBehaviour {
 
             if (hasCreature)
                 oCreature.Update();
+
+            if (hasStar)
+                oStar.Update();
         }
 
         public void applyWeapon(int objID, Vector3 pos, WeaponType weaponType) {
@@ -488,13 +491,13 @@ public abstract class Base {
 
         iStatus = status;
 
-        if (iStatus == ObjStatus.Invisible){
+        if (iStatus == ObjStatus.Invisible || iStatus == ObjStatus.Hide) {
             obj.renderer.enabled = false;
             obj.collider.enabled = false;
         }
-        else{
+        else {
             obj.renderer.enabled = true;
-            obj.renderer.enabled = true;	
+            obj.collider.enabled = true;	
         }
     }
 
@@ -509,7 +512,7 @@ public abstract class Base {
         return obj.transform.localPosition;
     }
 
-    public void Update() {
+    public virtual void Update() {
 
         if (iStatus == ObjStatus.Normal) {
             if (iDirection == 0)
@@ -573,8 +576,13 @@ public class WeaponBox: Base {
 
     public override int whenCollide() {
 
-        base.setStatus(ObjStatus.Invisible);
-        return iType;
+        if (iStatus == ObjStatus.Stop) {
+
+            base.setStatus(ObjStatus.Invisible);
+            return iType;
+        }
+		
+		return 0;
     }
 
     protected override int generateType(float top, float bottom, Config oDetails) {
@@ -600,8 +608,11 @@ public class OxygenCan: Base {
 
     public override int whenCollide() {
 
-        base.setStatus(ObjStatus.Invisible);
-        return 0;
+        if (iStatus == ObjStatus.Stop) {
+
+            base.setStatus(ObjStatus.Invisible);
+        }
+		return 0;
     }
 
     protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
@@ -611,24 +622,38 @@ public class OxygenCan: Base {
 public class Star: Base {
 
     Dashboard dashBoard;
+    Grid grid;
 
     public Star(float top, float bottom) : base(top, bottom) {
 
         obj.tag = "Star";
-        iStatus = ObjStatus.Stop;
+		base.setStatus(ObjStatus.Hide);
         Material mat = Resources.Load ("Materials/mStar", typeof(Material)) as Material;
         obj.renderer.material = mat;
         obj.transform.localScale = new Vector3(1.0f, 1.0f, 0.001F);
         obj.transform.Rotate(0, 180, 0);
 
         dashBoard = GameObject.Find("Main Camera").GetComponent("Dashboard") as Dashboard;
+        grid = GameObject.Find("Main Camera").GetComponent("Grid") as Grid;
     }
 
     public override int whenCollide() {
+		
+        if (iStatus == ObjStatus.Stop) {
 
-        dashBoard.iScore += 50;
-        base.setStatus(ObjStatus.Invisible);
+            dashBoard.iScore += 50;
+            base.setStatus(ObjStatus.Invisible);
+        }
         return 0;
+    }
+
+    public override void Update() {
+
+        if (grid.CurrentDirection == GameDirection.FlyingDown)
+			if (iStatus == ObjStatus.Hide)
+            {
+				base.setStatus(ObjStatus.Stop);
+            }
     }
 
     protected override int generateType(float top, float bottom, Config oDetails) { return 0;}
