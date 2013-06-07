@@ -13,7 +13,6 @@ public class MainMenu : MonoBehaviour
 
 	void OnGUI () {
 		GUI.skin = MenuGUIskins;
-
 		GUIStyle myButtonStyle = new GUIStyle(GUI.skin.button);
 
         // Load and set Font
