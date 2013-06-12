@@ -18,47 +18,41 @@ public class MainMenu : MonoBehaviour
         // Load and set Font
         Font myFont = (Font)Resources.Load("Font/HoboStd", typeof(Font));
         myButtonStyle.font = myFont;
-
+		myButtonStyle.fontSize = 40;
         // Set color for selected and unselected buttons
-        myButtonStyle.normal.textColor = Color.white;
-        myButtonStyle.hover.textColor = Color.red;
+        myButtonStyle.normal.textColor = Color.gray;
+        myButtonStyle.hover.textColor = Color.white;
 		
 		if (MainBgPic != null) {
 			GUI.DrawTexture (new Rect (0, 0, Screen.width, Screen.height), MainBgPic);
 		}
 		
-		if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 260) / 2, 150, 80), "Start!", myButtonStyle)) {
+		if (GUI.Button (new Rect ((Screen.width - 900) / 2, (Screen.height + 300) / 2, 200, 100), "Start!", myButtonStyle)) {
 			Button2 = true;
 		}
 		
-		if (!Button2) {	
-			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height - 80) / 2, 150, 80), "Game Facts", myButtonStyle)) {
+		if (GUI.Button (new Rect ((Screen.width - 300) / 2, (Screen.height + 300) / 2, 300, 100), "Game Facts", myButtonStyle)) {
 				Application.LoadLevel ("Tutor");
-			}				
-			if (GUI.Button (new Rect ((Screen.width - 150) / 2, (Screen.height + 100) / 2, 150, 80), "Exit", myButtonStyle)) {
+		}				
+		if (GUI.Button (new Rect ((Screen.width + 500) / 2, (Screen.height + 300) / 2, 200, 100), "Exit", myButtonStyle)) {
 				Application.Quit ();
-			}
 		}
 		
 		if (Button2) {
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 260) / 2, 150, 80), "Easy Level", myButtonStyle)) {				
+			if (GUI.Button (new Rect ((Screen.width - 1100) / 2, (Screen.height + 550) / 2, 300, 100), "Easy Level", myButtonStyle)) {				
 				ApplicationModel.levelPath = "Assets/Resources/level1.txt";
 				Application.LoadLevel ("Main");
 			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height - 80) / 2, 150, 80), "Mid Level", myButtonStyle)) {				
+			if (GUI.Button (new Rect ((Screen.width - 300) / 2, (Screen.height + 550) / 2, 300, 100), "Mid Level", myButtonStyle)) {				
 				
 				ApplicationModel.levelPath = "Assets/Resources/level2.txt";
 				Application.LoadLevel ("Main");
 			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 100) / 2, 150, 80), "Hard Level", myButtonStyle)) {				
+			if (GUI.Button (new Rect ((Screen.width + 500) / 2, (Screen.height + 550) / 2, 300, 100), "Hard Level", myButtonStyle)) {				
 				
 				ApplicationModel.levelPath = "Assets/Resources/level3.txt";
 				Application.LoadLevel ("Main");
-			}
-			if (GUI.Button (new Rect ((Screen.width + 200) / 2, (Screen.height + 280) / 2, 150, 80), "Back", myButtonStyle)) {				
-				Button2 = false;
-			}
-			
+			}			
 		}
 	}
 
