@@ -21,7 +21,11 @@ public class ApplicationModel : MonoBehaviour
 public class Grid : MonoBehaviour {
 
     static string levelPath;
-
+	
+	public float screenWidth = 18;
+	public float screenHeight = 15;
+	public float pixelRatio = 0.05f;
+	
     public float speedFactor = 1;
     float gameSpeed = -0.1f;
     float baseSpeed = -0.1f;
@@ -53,7 +57,11 @@ public class Grid : MonoBehaviour {
         oBlackPlane = GameObject.Find("BlackPlane");
 
         player = oPlayer.GetComponent("Player") as Player;
-
+		
+		pixelRatio = oCamera.camera.orthographicSize * 2 / oCamera.camera.pixelHeight;
+		screenWidth = Screen.width * pixelRatio;
+		screenHeight = Screen.height * pixelRatio;
+		
         objectDetails = new Config[2];
         objectDetails[0] = new Config("Assets/Resources/allfish.txt");
         objectDetails[1] = new Config("Assets/Resources/allbird.txt");
@@ -475,8 +483,8 @@ public abstract class Base {
 
     float leftInitial = -17;
     float rightInitial = 17;
-    float screenLeft = -18;
-    float screenRight = 18;
+    float screenLeft = -20;
+    float screenRight = 20;
 
     public Base(float top, float bottom) {
         iDirection = Random.Range(0, 2);

@@ -67,7 +67,6 @@ public class Player : MonoBehaviour {
         }
 
 
-
         if (!isPaused) {
 			
 			
@@ -117,20 +116,20 @@ public class Player : MonoBehaviour {
 
             if (grid.CurrentDirection == GameDirection.FlyingUp)
                 fFuel -= Time.deltaTime;
-
+			
             if (currentEffect == PlayerEffect.Inverse) {
 
-                if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x < 17) {
+                if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x < (grid.screenWidth/2 - 1.5)) {
                     oPlayer.transform.Translate(0.5F, 0, 0);
                     oBubble.transform.Translate(0.5F, 0, 0);
                 }
-                else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x > -17) {
+                else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x > -(grid.screenWidth/2 - 1.5)) {
                     oPlayer.transform.Translate(-0.5F, 0, 0);
                     oBubble.transform.Translate(-0.5F, 0, 0);
                 }			
             }
             else {
-                if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -17) {
+                if (Input.GetKey(KeyCode.LeftArrow) && oPlayer.transform.localPosition.x > -(grid.screenWidth/2 - 1.5)) {
 					if(grid.CurrentDirection == GameDirection.DivingUp){
 						Material mat = Resources.Load ("Materials/player/player_divingupleft", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
@@ -150,7 +149,7 @@ public class Player : MonoBehaviour {
                     oPlayer.transform.Translate(-0.5F, 0, 0);
                     oBubble.transform.Translate(-0.5F, 0, 0);
                 }
-                else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < 17) {
+                else if (Input.GetKey(KeyCode.RightArrow) && oPlayer.transform.localPosition.x < (grid.screenWidth/2 - 1.5)) {
 					if(grid.CurrentDirection == GameDirection.DivingUp){
 						Material mat = Resources.Load ("Materials/player/player_divingupright", typeof(Material)) as Material;
 						oPlayer.renderer.material = mat;
@@ -191,10 +190,14 @@ public class Player : MonoBehaviour {
 				}
             }	
 
-            if (Input.GetKey (KeyCode.UpArrow) && (oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) < 7.5) {
+            if (Input.GetKey (KeyCode.UpArrow) && 
+				(oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) < (grid.screenHeight /2 - 1.5)) {
+				
                 oPlayer.transform.Translate (0, 0.3F, 0);
                 oBubble.transform.Translate (0, 0.3F, 0);
-            } else if (Input.GetKey (KeyCode.DownArrow) && (oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) > -7.5) {
+            } else if (Input.GetKey (KeyCode.DownArrow) && 
+				(oPlayer.transform.localPosition.y - oCamera.transform.localPosition.y) > -(grid.screenHeight /2 - 1.5)) {
+				
                 oPlayer.transform.Translate (0, -0.3F, 0);
                 oBubble.transform.Translate (0, -0.3F, 0);
             }
