@@ -61,6 +61,10 @@ public class MainMenu : MonoBehaviour
 		oback2 = GameObject.Find ("Plane2");
 		//oaudio=GameObject.Find("audio");
 	}
+	
+	void Awake() {
+		QualitySettings.SetQualityLevel(4);
+	}
 
 	void Update () {
 		float speed = -0.1f;
